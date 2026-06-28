@@ -159,6 +159,20 @@
     .prog-bar{height:6px;background:var(--success);border-radius:3px}
     .prog-bar.partial{background:var(--warning)}
     .prog-bar.zero{background:var(--g300)}
+    /* Mobile bottom nav */
+    .mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:62px;background:var(--g900);z-index:500;flex-direction:row;justify-content:space-around;align-items:center;border-top:1px solid rgba(255,255,255,.12);padding:0 2px}
+    .mob-ni{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:4px 4px;color:var(--g400);cursor:pointer;border-radius:8px;flex:1;min-width:0}
+    .mob-ni.active{color:#fff}
+    .mob-ni .ic{font-size:1.4rem;line-height:1.1}
+    .mob-ni .lb{font-size:.6rem;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:52px;text-align:center}
+    @media(max-width:768px){.mob-nav{display:flex}#sidebar{display:none}#main{padding-bottom:68px}}
+    /* Parcela edit rows */
+    .pe-row{display:flex;align-items:center;gap:6px;padding:7px 4px;border-bottom:1px solid var(--g100)}
+    .pe-num{width:24px;font-size:.78rem;color:var(--g400);flex-shrink:0;text-align:center}
+    .pe-row input[type="date"],.pe-row input[type="number"]{padding:5px 7px;border:1px solid var(--g300);border-radius:6px;font-size:.82rem;color:var(--g800);background:#fff}
+    .pe-row input[type="date"]{flex:1;min-width:100px}
+    .pe-row input[type="number"]{width:86px}
+    .pe-ck{display:flex;align-items:center;gap:3px;font-size:.78rem;color:var(--g600);white-space:nowrap;flex-shrink:0}
   </style>
 </head>
 <body>
@@ -187,6 +201,15 @@
     <div class="pg" id="content"></div>
   </div>
 </div>
+
+<nav class="mob-nav" id="mob-nav">
+  <div class="mob-ni active" data-page="dashboard"><span class="ic">&#x1F4CA;</span><span class="lb">Dashboard</span></div>
+  <div class="mob-ni" data-page="estoque"><span class="ic">&#x1F697;</span><span class="lb">Estoque</span></div>
+  <div class="mob-ni" data-page="compras"><span class="ic">&#x1F6D2;</span><span class="lb">Compras</span></div>
+  <div class="mob-ni" data-page="vendas"><span class="ic">&#x1F4B0;</span><span class="lb">Vendas</span></div>
+  <div class="mob-ni" data-page="parcelamentos"><span class="ic">&#x1F4C5;</span><span class="lb">Parcelas</span></div>
+  <div class="mob-ni" data-page="relatorios"><span class="ic">&#x1F4C8;</span><span class="lb">Relatos</span></div>
+</nav>
 
 <div class="mo hidden" id="mo">
   <div class="md">
@@ -342,7 +365,7 @@ var PAGE_TITLES={ dashboard:'Dashboard', estoque:'Estoque de Veiculos', compras:
 
 function navigate(page) {
   currentPage=page;
-  var items=document.querySelectorAll('.ni');
+  var items=document.querySelectorAll('.ni,.mob-ni');
   for (var i=0; i<items.length; i++) {
     if (items[i].dataset.page===page) items[i].classList.add('active');
     else items[i].classList.remove('active');
@@ -351,7 +374,7 @@ function navigate(page) {
   renderPage(page);
 }
 
-var navItems=document.querySelectorAll('.ni');
+var navItems=document.querySelectorAll('.ni,.mob-ni');
 for (var _i=0; _i<navItems.length; _i++) {
   (function(el){ el.onclick=function(){ navigate(el.dataset.page); }; })(navItems[_i]);
 }
@@ -882,6 +905,7 @@ function pageParcelamentos() {
       '<div style="display:flex;align-items:center;gap:10px;flex-shrink:0">'+
       (vencidas>0?'<span class="badge bd">'+vencidas+' vencida(s)</span>':pendente===0?'<span class="badge bg">Quitado</span>':'<span class="badge by">'+pendente+' pendente(s)</span>')+
       '<div class="prog-bar-bg"><div class="prog-bar'+(pagoPct===0?' zero':pagoPct<100?' partial':'')+'" style="width:'+pagoPct+'%"></div></div>'+
+      '<button class="btn bg2 bsm bic" onclick="event.stopPropagation();openParcelamentoForm(\''+ grupo.id +'\')" title="Editar">&#x270F;&#xFE0F;</button>'+
       '<button class="btn bd bsm bic" onclick="event.stopPropagation();deleteParcelamento(\''+ grupo.id +'\')" title="Excluir grupo">&#x1F5D1;</button>'+
       '</div>'+
       '</div>'+
@@ -940,47 +964,137 @@ function deleteParcelamento(id) {
   });
 }
 
+var _peCount=0;
+
+function _peRow(idx, num, vencimento, valor, pago) {
+  return '<div class="pe-row" id="per'+idx+'">'+
+    '<span class="pe-num">'+(idx+1)+'</span>'+
+    '<input type="date" data-f="venc" value="'+vencimento+'" required>'+
+    '<input type="number" data-f="val" value="'+valor+'" step="0.01" min="0" placeholder="0.00" required>'+
+    '<label class="pe-ck"><input type="checkbox" data-f="pago"'+(pago?' checked':'')+'> Pago</label>'+
+    '<button type="button" class="btn bg2 bsm bic" onclick="removePeRow('+idx+')">&#x2715;</button>'+
+    '</div>';
+}
+
+function removePeRow(idx) {
+  var el=document.getElementById('per'+idx);
+  if(el&&el.parentNode) el.parentNode.removeChild(el);
+  _reNumberPeRows();
+}
+
+function _reNumberPeRows() {
+  var rows=document.querySelectorAll('#pe-list .pe-row');
+  for(var i=0;i<rows.length;i++) {
+    var sp=rows[i].querySelector('.pe-num');
+    if(sp) sp.textContent=String(i+1);
+  }
+}
+
+function addPeRow() {
+  var list=document.getElementById('pe-list');
+  if(!list) return;
+  var el=document.createElement('div');
+  el.innerHTML=_peRow(_peCount, _peCount+1, todayISO(), '', false);
+  list.appendChild(el.firstChild);
+  _peCount++;
+  _reNumberPeRows();
+}
+
+function _collectParcelas() {
+  var rows=document.querySelectorAll('#pe-list .pe-row');
+  var parcelas=[];
+  for(var i=0;i<rows.length;i++){
+    var venc=rows[i].querySelector('[data-f="venc"]');
+    var val=rows[i].querySelector('[data-f="val"]');
+    var pago=rows[i].querySelector('[data-f="pago"]');
+    if(!venc||!val) continue;
+    parcelas.push({num:String(i+1), vencimento:venc.value, valor:parseFloat(val.value)||0, pago:pago?pago.checked:false});
+  }
+  return parcelas;
+}
+
 function openParcelamentoForm(id) {
   var grupo=null;
   for (var i=0; i<state.parcelamentos.length; i++) { if(state.parcelamentos[i].id===id){grupo=state.parcelamentos[i];break;} }
-  var html='<form id="parcf" onsubmit="saveParcelamento(event)">'+
-    '<input type="hidden" name="pid" value="'+(id||'')+'">'+
-    '<div class="fg">'+
-    '<div class="fd"><label>Comprador *</label><input type="text" name="comprador" value="'+prop(grupo,'comprador')+'" required placeholder="Nome do comprador"></div>'+
-    '<div class="fd"><label>Veiculo</label><input type="text" name="veiculo" value="'+prop(grupo,'veiculo')+'" placeholder="Ex: HILUX, GOL"></div>'+
-    '<div class="fd"><label>Numero de Parcelas *</label><input type="number" name="numParcelas" value="12" min="1" max="120" required></div>'+
-    '<div class="fd"><label>Valor por Parcela (R$) *</label><input type="number" name="valorParcela" value="" min="0" step="0.01" required placeholder="0.00"></div>'+
-    '<div class="fd"><label>Data 1a Parcela *</label><input type="date" name="dataInicio" value="'+todayISO()+'" required></div>'+
-    '<div class="fd"><label>Dia de Vencimento</label><input type="number" name="diaVenc" value="10" min="1" max="28" placeholder="10"></div>'+
-    '</div>'+
-    '<div class="fa"><button type="button" class="btn bg2" onclick="closeModal()">Cancelar</button><button type="submit" class="btn bp">&#x1F4BE; Salvar</button></div>'+
-    '</form>';
-  openModal('Novo Parcelamento', html);
+
+  if (grupo) {
+    // Modo edição: mostrar parcelas individualmente
+    _peCount=grupo.parcelas.length;
+    var peHtml='';
+    for(var j=0;j<grupo.parcelas.length;j++){
+      var p=grupo.parcelas[j];
+      peHtml+=_peRow(j, p.num||String(j+1), p.vencimento, p.valor, p.pago);
+    }
+    var html='<form id="parcf" onsubmit="saveParcelamento(event)">'+
+      '<input type="hidden" name="pid" value="'+id+'">'+
+      '<input type="hidden" name="modo" value="edit">'+
+      '<div class="fg" style="margin-bottom:16px">'+
+      '<div class="fd"><label>Comprador *</label><input type="text" name="comprador" value="'+prop(grupo,'comprador')+'" required></div>'+
+      '<div class="fd"><label>Veiculo</label><input type="text" name="veiculo" value="'+prop(grupo,'veiculo')+'"></div>'+
+      '</div>'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'+
+      '<strong style="font-size:.9rem;color:var(--g700)">Parcelas ('+grupo.parcelas.length+')</strong>'+
+      '<button type="button" class="btn bg2 bsm" onclick="addPeRow()">+ Adicionar Parcela</button>'+
+      '</div>'+
+      '<div style="font-size:.75rem;color:var(--g400);display:flex;gap:6px;padding:0 4px 4px;font-weight:600">'+
+      '<span style="width:24px">#</span><span style="flex:1">Vencimento</span><span style="width:86px">Valor (R$)</span><span style="width:60px">Pago?</span><span style="width:28px"></span>'+
+      '</div>'+
+      '<div id="pe-list" style="max-height:350px;overflow-y:auto">'+peHtml+'</div>'+
+      '<div class="fa"><button type="button" class="btn bg2" onclick="closeModal()">Cancelar</button><button type="submit" class="btn bp">&#x1F4BE; Salvar</button></div>'+
+      '</form>';
+    openModal('Editar Parcelamento', html);
+  } else {
+    // Modo novo: gerar parcelas automaticamente
+    var html2='<form id="parcf" onsubmit="saveParcelamento(event)">'+
+      '<input type="hidden" name="pid" value="">'+
+      '<input type="hidden" name="modo" value="new">'+
+      '<div class="fg">'+
+      '<div class="fd"><label>Comprador *</label><input type="text" name="comprador" value="" required placeholder="Nome do comprador"></div>'+
+      '<div class="fd"><label>Veiculo</label><input type="text" name="veiculo" value="" placeholder="Ex: HILUX, GOL"></div>'+
+      '<div class="fd"><label>Numero de Parcelas *</label><input type="number" name="numParcelas" value="12" min="1" max="120" required></div>'+
+      '<div class="fd"><label>Valor por Parcela (R$) *</label><input type="number" name="valorParcela" value="" min="0" step="0.01" required placeholder="0.00"></div>'+
+      '<div class="fd"><label>Data da 1a Parcela *</label><input type="date" name="dataInicio" value="'+todayISO()+'" required></div>'+
+      '<div class="fd"><label>Dia de Vencimento</label><input type="number" name="diaVenc" value="10" min="1" max="28" placeholder="10"></div>'+
+      '</div>'+
+      '<div class="fa"><button type="button" class="btn bg2" onclick="closeModal()">Cancelar</button><button type="submit" class="btn bp">&#x1F4BE; Gerar Parcelas</button></div>'+
+      '</form>';
+    openModal('Novo Parcelamento', html2);
+  }
 }
 
 function saveParcelamento(e) {
   e.preventDefault();
   var d=formToObj(e.target);
   var id=d.pid; delete d.pid;
-  var n=parseInt(d.numParcelas)||1;
-  var val=parseFloat(d.valorParcela)||0;
-  var dataIni=d.dataInicio;
-  var diaVenc=parseInt(d.diaVenc)||10;
-  var parcelas=[];
-  for (var i=0; i<n; i++) {
-    var dt=new Date(dataIni);
-    dt.setMonth(dt.getMonth()+i);
-    dt.setDate(diaVenc);
-    var isoD=dt.getFullYear()+'-'+(dt.getMonth()+1<10?'0':'')+String(dt.getMonth()+1)+'-'+(dt.getDate()<10?'0':'')+String(dt.getDate());
-    parcelas.push({ num:String(i+1), vencimento:isoD, valor:val, pago:false });
-  }
-  if (id) {
+  var modo=d.modo; delete d.modo;
+
+  if (modo==='edit') {
+    var parcelas=_collectParcelas();
+    if(parcelas.length===0){ showToast('Adicione pelo menos uma parcela.','error'); return; }
     for (var j=0; j<state.parcelamentos.length; j++) {
-      if(state.parcelamentos[j].id===id){ state.parcelamentos[j].comprador=d.comprador; state.parcelamentos[j].veiculo=d.veiculo; break; }
+      if(state.parcelamentos[j].id===id){
+        state.parcelamentos[j].comprador=d.comprador;
+        state.parcelamentos[j].veiculo=d.veiculo;
+        state.parcelamentos[j].parcelas=parcelas;
+        break;
+      }
     }
     showToast('Parcelamento atualizado!');
   } else {
-    state.parcelamentos.push({ id:genId(), comprador:d.comprador, veiculo:d.veiculo, parcelas:parcelas });
+    var n=parseInt(d.numParcelas)||1;
+    var val=parseFloat(d.valorParcela)||0;
+    var dataIni=d.dataInicio;
+    var diaVenc=parseInt(d.diaVenc)||10;
+    var newParc=[];
+    for (var i=0; i<n; i++) {
+      var dt=new Date(dataIni+'T12:00:00');
+      dt.setMonth(dt.getMonth()+i);
+      dt.setDate(diaVenc);
+      var mm=dt.getMonth()+1; var dd2=dt.getDate();
+      var isoD=dt.getFullYear()+'-'+(mm<10?'0':'')+mm+'-'+(dd2<10?'0':'')+dd2;
+      newParc.push({num:String(i+1), vencimento:isoD, valor:val, pago:false});
+    }
+    state.parcelamentos.push({id:genId(), comprador:d.comprador, veiculo:d.veiculo, parcelas:newParc});
     showToast('Parcelamento cadastrado!');
   }
   saveState(); closeModal(); renderPage(PPARCL);
