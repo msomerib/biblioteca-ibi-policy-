@@ -3,433 +3,206 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AutoGestão — Compra e Venda de Veículos</title>
+  <title>AutoGestao - Compra e Venda de Veiculos</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --primary: #1d4ed8;
-      --primary-dark: #1e3a8a;
-      --primary-light: #dbeafe;
-      --success: #16a34a;
-      --success-light: #dcfce7;
-      --danger: #dc2626;
-      --danger-light: #fee2e2;
-      --warning: #d97706;
-      --warning-light: #fef3c7;
-      --gray-50: #f8fafc;
-      --gray-100: #f1f5f9;
-      --gray-200: #e2e8f0;
-      --gray-300: #cbd5e1;
-      --gray-400: #94a3b8;
-      --gray-500: #64748b;
-      --gray-600: #475569;
-      --gray-700: #334155;
-      --gray-800: #1e293b;
-      --gray-900: #0f172a;
-      --sidebar-w: 240px;
-      --radius: 10px;
-      --shadow: 0 1px 3px rgba(0,0,0,.1), 0 1px 2px rgba(0,0,0,.06);
-      --shadow-md: 0 4px 6px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.06);
-      --shadow-lg: 0 10px 15px rgba(0,0,0,.1), 0 4px 6px rgba(0,0,0,.05);
+      --primary: #1d4ed8; --primary-light: #dbeafe;
+      --success: #16a34a; --success-light: #dcfce7;
+      --danger: #dc2626;  --danger-light: #fee2e2;
+      --warning: #d97706; --warning-light: #fef3c7;
+      --g50:#f8fafc; --g100:#f1f5f9; --g200:#e2e8f0; --g300:#cbd5e1;
+      --g400:#94a3b8; --g500:#64748b; --g600:#475569; --g700:#334155;
+      --g800:#1e293b; --g900:#0f172a;
+      --sw: 240px; --r: 10px;
+      --sh: 0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06);
+      --shm: 0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.06);
+      --shl: 0 10px 15px rgba(0,0,0,.1),0 4px 6px rgba(0,0,0,.05);
     }
-
-    html, body { height: 100%; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--gray-100); color: var(--gray-800); font-size: 14px; }
-
-    #app { display: flex; height: 100vh; overflow: hidden; }
-
-    #sidebar {
-      width: var(--sidebar-w);
-      background: var(--gray-900);
-      display: flex;
-      flex-direction: column;
-      flex-shrink: 0;
-      overflow-y: auto;
+    html,body{height:100%;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--g100);color:var(--g800);font-size:14px}
+    #app{display:flex;height:100vh;overflow:hidden}
+    #sidebar{width:var(--sw);background:var(--g900);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+    .sl{padding:22px 20px 18px;border-bottom:1px solid rgba(255,255,255,.08)}
+    .sl .t{font-size:1.1rem;font-weight:700;color:#fff;line-height:1.2}
+    .sl .s{font-size:.75rem;color:var(--g400);margin-top:2px}
+    .sn{padding:12px 8px;flex:1}
+    .lbl{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--g500);padding:14px 12px 6px;font-weight:600}
+    .ni{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;color:var(--g400);font-size:.88rem;font-weight:500;transition:background .15s,color .15s;margin-bottom:2px}
+    .ni:hover{background:rgba(255,255,255,.06);color:#fff}
+    .ni.active{background:var(--primary);color:#fff}
+    .ni .ic{font-size:1rem;width:20px;text-align:center}
+    #main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+    .tb{background:#fff;border-bottom:1px solid var(--g200);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+    .tb-t{font-size:1rem;font-weight:600;color:var(--g800)}
+    .pg{padding:28px;flex:1}
+    .kgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px}
+    .kc{background:#fff;border-radius:var(--r);padding:20px;box-shadow:var(--sh);display:flex;align-items:flex-start;gap:16px}
+    .ki{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+    .kc .lb{font-size:.78rem;color:var(--g500);font-weight:500;text-transform:uppercase;letter-spacing:.04em}
+    .kc .vl{font-size:1.5rem;font-weight:700;color:var(--g800);margin-top:4px;line-height:1}
+    .kc .sb{font-size:.78rem;color:var(--g400);margin-top:4px}
+    .card{background:#fff;border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
+    .ch{padding:16px 20px;border-bottom:1px solid var(--g100);display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .ch h2{font-size:.95rem;font-weight:600;color:var(--g800)}
+    .cb{padding:20px}
+    .card+.card{margin-top:20px}
+    .tw{overflow-x:auto}
+    table{width:100%;border-collapse:collapse;font-size:.85rem}
+    th{background:var(--g50);padding:10px 14px;text-align:left;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--g500);font-weight:600;border-bottom:1px solid var(--g200);white-space:nowrap}
+    td{padding:12px 14px;border-bottom:1px solid var(--g100);color:var(--g700);vertical-align:middle}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:var(--g50)}
+    .es{padding:40px 20px;text-align:center;color:var(--g400)}
+    .es .ic{font-size:2.5rem;margin-bottom:10px}
+    .es p{font-size:.9rem}
+    .badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;font-size:.73rem;font-weight:600;white-space:nowrap}
+    .bg{background:var(--success-light);color:var(--success)}
+    .by{background:var(--warning-light);color:var(--warning)}
+    .bb{background:var(--primary-light);color:var(--primary)}
+    .bgr{background:var(--g100);color:var(--g600)}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:7px;font-size:.85rem;font-weight:500;cursor:pointer;border:none;transition:filter .15s,transform .1s;white-space:nowrap}
+    .btn:active{transform:scale(.98)}
+    .bp{background:var(--primary);color:#fff}
+    .bp:hover{filter:brightness(1.1)}
+    .bs{background:var(--success);color:#fff}
+    .bs:hover{filter:brightness(1.1)}
+    .bd{background:var(--danger);color:#fff}
+    .bd:hover{filter:brightness(1.1)}
+    .bg2{background:transparent;color:var(--g600);border:1px solid var(--g200)}
+    .bg2:hover{background:var(--g50)}
+    .bsm{padding:5px 10px;font-size:.78rem}
+    .bic{padding:5px 8px}
+    .fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+    .ffc{grid-column:1/-1}
+    .fd{display:flex;flex-direction:column;gap:5px}
+    .fd label{font-size:.8rem;font-weight:600;color:var(--g600)}
+    .fd input,.fd select,.fd textarea{padding:9px 12px;border:1px solid var(--g300);border-radius:7px;font-size:.9rem;color:var(--g800);background:#fff;transition:border-color .15s,box-shadow .15s;font-family:inherit}
+    .fd input:focus,.fd select:focus,.fd textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(29,78,216,.12)}
+    .fd textarea{resize:vertical;min-height:80px}
+    .fd .ht{font-size:.75rem;color:var(--g400)}
+    .fa{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--g100)}
+    .mo{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;animation:fi .15s ease}
+    .mo.hidden{display:none}
+    .md{background:#fff;border-radius:12px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;box-shadow:var(--shl);animation:su .2s ease}
+    .mh{padding:20px 24px 16px;border-bottom:1px solid var(--g100);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1}
+    .mh h3{font-size:1rem;font-weight:600}
+    .mb{padding:20px 24px 24px}
+    .mc{background:none;border:none;cursor:pointer;font-size:1.3rem;color:var(--g400);line-height:1;padding:2px}
+    .mc:hover{color:var(--g700)}
+    @keyframes fi{from{opacity:0}to{opacity:1}}
+    @keyframes su{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .sb-w{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+    .si-w{position:relative;flex:1;min-width:180px}
+    .si-w input{width:100%;padding:8px 12px 8px 34px;border:1px solid var(--g300);border-radius:7px;font-size:.85rem;color:var(--g800)}
+    .si-w input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(29,78,216,.12)}
+    .si-ic{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--g400);font-size:.9rem;pointer-events:none}
+    .dg{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .rl{list-style:none}
+    .ri{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--g100)}
+    .ri:last-child{border-bottom:none}
+    .rd{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .rd.compra{background:var(--danger)}
+    .rd.venda{background:var(--success)}
+    .ri-i{flex:1;min-width:0}
+    .ri-t{font-size:.85rem;font-weight:500;color:var(--g800);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .ri-s{font-size:.78rem;color:var(--g400)}
+    .ri-v{font-size:.85rem;font-weight:600;white-space:nowrap}
+    .vr{color:var(--danger)}.vg{color:var(--success)}
+    .pbt td:first-child{font-weight:500}
+    .pbw{display:flex;align-items:center;gap:8px}
+    .pb{height:8px;border-radius:4px;background:var(--success);min-width:4px}
+    .pb.ng{background:var(--danger)}
+    .fs{padding:8px 12px;border:1px solid var(--g300);border-radius:7px;font-size:.85rem;color:var(--g700);cursor:pointer}
+    @media(max-width:768px){
+      #sidebar{width:52px}
+      .sl .t,.sl .s,.lbl,.ni span{display:none}
+      .ni{justify-content:center;padding:10px}
+      .dg{grid-template-columns:1fr}
+      .pg{padding:16px}
+      .tb{padding:0 16px}
     }
-    .sidebar-logo {
-      padding: 22px 20px 18px;
-      border-bottom: 1px solid rgba(255,255,255,.08);
-    }
-    .sidebar-logo .logo-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #fff;
-      line-height: 1.2;
-    }
-    .sidebar-logo .logo-sub {
-      font-size: .75rem;
-      color: var(--gray-400);
-      margin-top: 2px;
-    }
-    .sidebar-nav { padding: 12px 8px; flex: 1; }
-    .nav-section-label {
-      font-size: .68rem;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      color: var(--gray-500);
-      padding: 14px 12px 6px;
-      font-weight: 600;
-    }
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 9px 12px;
-      border-radius: 8px;
-      cursor: pointer;
-      color: var(--gray-400);
-      font-size: .88rem;
-      font-weight: 500;
-      transition: background .15s, color .15s;
-      margin-bottom: 2px;
-    }
-    .nav-item:hover { background: rgba(255,255,255,.06); color: #fff; }
-    .nav-item.active { background: var(--primary); color: #fff; }
-    .nav-item .icon { font-size: 1rem; width: 20px; text-align: center; }
-
-    #main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
-
-    .topbar {
-      background: #fff;
-      border-bottom: 1px solid var(--gray-200);
-      padding: 0 28px;
-      height: 58px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-shrink: 0;
-    }
-    .topbar-title { font-size: 1rem; font-weight: 600; color: var(--gray-800); }
-    .topbar-right { display: flex; align-items: center; gap: 10px; }
-
-    .page { padding: 28px; flex: 1; }
-
-    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
-    .kpi-card {
-      background: #fff;
-      border-radius: var(--radius);
-      padding: 20px;
-      box-shadow: var(--shadow);
-      display: flex;
-      align-items: flex-start;
-      gap: 16px;
-    }
-    .kpi-icon {
-      width: 44px; height: 44px;
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.3rem;
-      flex-shrink: 0;
-    }
-    .kpi-card .label { font-size: .78rem; color: var(--gray-500); font-weight: 500; text-transform: uppercase; letter-spacing: .04em; }
-    .kpi-card .value { font-size: 1.5rem; font-weight: 700; color: var(--gray-800); margin-top: 4px; line-height: 1; }
-    .kpi-card .sub { font-size: .78rem; color: var(--gray-400); margin-top: 4px; }
-
-    .card {
-      background: #fff;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-    .card-header {
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--gray-100);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-    .card-header h2 { font-size: .95rem; font-weight: 600; color: var(--gray-800); }
-    .card-body { padding: 20px; }
-    .card + .card { margin-top: 20px; }
-
-    .table-wrap { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; font-size: .85rem; }
-    th {
-      background: var(--gray-50);
-      padding: 10px 14px;
-      text-align: left;
-      font-size: .75rem;
-      text-transform: uppercase;
-      letter-spacing: .05em;
-      color: var(--gray-500);
-      font-weight: 600;
-      border-bottom: 1px solid var(--gray-200);
-      white-space: nowrap;
-    }
-    td {
-      padding: 12px 14px;
-      border-bottom: 1px solid var(--gray-100);
-      color: var(--gray-700);
-      vertical-align: middle;
-    }
-    tr:last-child td { border-bottom: none; }
-    tr:hover td { background: var(--gray-50); }
-    .empty-state { padding: 40px 20px; text-align: center; color: var(--gray-400); }
-    .empty-state .icon { font-size: 2.5rem; margin-bottom: 10px; }
-    .empty-state p { font-size: .9rem; }
-
-    .badge {
-      display: inline-flex; align-items: center;
-      padding: 3px 10px;
-      border-radius: 999px;
-      font-size: .73rem;
-      font-weight: 600;
-      white-space: nowrap;
-    }
-    .badge-green { background: var(--success-light); color: var(--success); }
-    .badge-red { background: var(--danger-light); color: var(--danger); }
-    .badge-yellow { background: var(--warning-light); color: var(--warning); }
-    .badge-blue { background: var(--primary-light); color: var(--primary); }
-    .badge-gray { background: var(--gray-100); color: var(--gray-600); }
-
-    .btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 8px 16px;
-      border-radius: 7px;
-      font-size: .85rem;
-      font-weight: 500;
-      cursor: pointer;
-      border: none;
-      transition: filter .15s, transform .1s;
-      white-space: nowrap;
-    }
-    .btn:active { transform: scale(.98); }
-    .btn-primary { background: var(--primary); color: #fff; }
-    .btn-primary:hover { filter: brightness(1.1); }
-    .btn-success { background: var(--success); color: #fff; }
-    .btn-success:hover { filter: brightness(1.1); }
-    .btn-danger { background: var(--danger); color: #fff; }
-    .btn-danger:hover { filter: brightness(1.1); }
-    .btn-ghost { background: transparent; color: var(--gray-600); border: 1px solid var(--gray-200); }
-    .btn-ghost:hover { background: var(--gray-50); }
-    .btn-sm { padding: 5px 10px; font-size: .78rem; }
-    .btn-icon { padding: 5px 8px; }
-
-    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
-    .form-col-2 { grid-column: span 2; }
-    .form-col-full { grid-column: 1 / -1; }
-    .field { display: flex; flex-direction: column; gap: 5px; }
-    .field label { font-size: .8rem; font-weight: 600; color: var(--gray-600); }
-    .field input, .field select, .field textarea {
-      padding: 9px 12px;
-      border: 1px solid var(--gray-300);
-      border-radius: 7px;
-      font-size: .9rem;
-      color: var(--gray-800);
-      background: #fff;
-      transition: border-color .15s, box-shadow .15s;
-      font-family: inherit;
-    }
-    .field input:focus, .field select:focus, .field textarea:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(29,78,216,.12);
-    }
-    .field textarea { resize: vertical; min-height: 80px; }
-    .field .hint { font-size: .75rem; color: var(--gray-400); }
-    .form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--gray-100); }
-
-    .modal-overlay {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,.45);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 1000;
-      padding: 20px;
-      animation: fadeIn .15s ease;
-    }
-    .modal-overlay.hidden { display: none; }
-    .modal {
-      background: #fff;
-      border-radius: 12px;
-      width: 100%; max-width: 640px;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: var(--shadow-lg);
-      animation: slideUp .2s ease;
-    }
-    .modal-header {
-      padding: 20px 24px 16px;
-      border-bottom: 1px solid var(--gray-100);
-      display: flex; align-items: center; justify-content: space-between;
-      position: sticky; top: 0; background: #fff; z-index: 1;
-    }
-    .modal-header h3 { font-size: 1rem; font-weight: 600; }
-    .modal-body { padding: 20px 24px 24px; }
-    .modal-close { background: none; border: none; cursor: pointer; font-size: 1.3rem; color: var(--gray-400); line-height: 1; padding: 2px; }
-    .modal-close:hover { color: var(--gray-700); }
-
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-    .search-bar {
-      display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
-      margin-bottom: 16px;
-    }
-    .search-input-wrap { position: relative; flex: 1; min-width: 180px; }
-    .search-input-wrap input {
-      width: 100%; padding: 8px 12px 8px 34px;
-      border: 1px solid var(--gray-300); border-radius: 7px;
-      font-size: .85rem; color: var(--gray-800);
-    }
-    .search-input-wrap input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(29,78,216,.12); }
-    .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--gray-400); font-size: .9rem; pointer-events: none; }
-
-    .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    .recent-list { list-style: none; }
-    .recent-item {
-      display: flex; align-items: center; gap: 12px;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--gray-100);
-    }
-    .recent-item:last-child { border-bottom: none; }
-    .recent-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-    .recent-dot.compra { background: var(--danger); }
-    .recent-dot.venda { background: var(--success); }
-    .recent-info { flex: 1; min-width: 0; }
-    .recent-title { font-size: .85rem; font-weight: 500; color: var(--gray-800); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .recent-sub { font-size: .78rem; color: var(--gray-400); }
-    .recent-val { font-size: .85rem; font-weight: 600; white-space: nowrap; }
-    .val-red { color: var(--danger); }
-    .val-green { color: var(--success); }
-
-    .report-table td:first-child { font-weight: 500; }
-    .profit-bar-wrap { display: flex; align-items: center; gap: 8px; }
-    .profit-bar { height: 8px; border-radius: 4px; background: var(--success); min-width: 4px; }
-    .profit-bar.neg { background: var(--danger); }
-
-    .filter-select {
-      padding: 8px 12px;
-      border: 1px solid var(--gray-300);
-      border-radius: 7px;
-      font-size: .85rem;
-      color: var(--gray-700);
-      cursor: pointer;
-    }
-
-    @media (max-width: 768px) {
-      #sidebar { width: 52px; }
-      .sidebar-logo .logo-title, .sidebar-logo .logo-sub, .nav-section-label, .nav-item span { display: none; }
-      .nav-item { justify-content: center; padding: 10px; }
-      .dash-grid { grid-template-columns: 1fr; }
-      .page { padding: 16px; }
-      .topbar { padding: 0 16px; }
-    }
-
-    .text-right { text-align: right; }
-    .text-mono { font-family: "Courier New", monospace; }
-    .font-bold { font-weight: 700; }
-    .mt-4 { margin-top: 16px; }
-    .flex { display: flex; }
-    .items-center { align-items: center; }
-    .gap-2 { gap: 8px; }
-    .w-full { width: 100%; }
-    .lucro-positive { color: var(--success); font-weight: 600; }
-    .lucro-negative { color: var(--danger); font-weight: 600; }
-    .text-muted { color: var(--gray-400); font-size: .82rem; }
-
-    .confirm-modal .modal { max-width: 400px; }
-    .confirm-body { padding: 24px; }
-    .confirm-body p { color: var(--gray-600); margin-bottom: 20px; font-size: .9rem; }
-    .confirm-actions { display: flex; gap: 10px; justify-content: flex-end; }
-
-    #toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 2000; display: flex; flex-direction: column; gap: 8px; }
-    .toast {
-      padding: 12px 18px; border-radius: 8px; color: #fff; font-size: .87rem;
-      box-shadow: var(--shadow-md); animation: slideIn .2s ease;
-      max-width: 300px;
-    }
-    .toast-success { background: var(--success); }
-    .toast-error { background: var(--danger); }
-    .toast-info { background: var(--primary); }
-    @keyframes slideIn { from { transform: translateX(60px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .tr{text-align:right}.tm{font-family:"Courier New",monospace}.fb{font-weight:700}.mt4{margin-top:16px}
+    .fl{display:flex}.ac{align-items:center}.g2{gap:8px}.lp{color:var(--success);font-weight:600}.ln{color:var(--danger);font-weight:600}
+    .mu{color:var(--g400);font-size:.82rem}
+    .cm .md{max-width:400px}
+    .cfb{padding:24px}
+    .cfb p{color:var(--g600);margin-bottom:20px;font-size:.9rem}
+    .cfa{display:flex;gap:10px;justify-content:flex-end}
+    #tc{position:fixed;bottom:24px;right:24px;z-index:2000;display:flex;flex-direction:column;gap:8px}
+    .ts{padding:12px 18px;border-radius:8px;color:#fff;font-size:.87rem;box-shadow:var(--shm);animation:si2 .2s ease;max-width:300px}
+    .ts-s{background:var(--success)}.ts-e{background:var(--danger)}.ts-i{background:var(--primary)}
+    @keyframes si2{from{transform:translateX(60px);opacity:0}to{transform:translateX(0);opacity:1}}
   </style>
 </head>
 <body>
 <div id="app">
   <nav id="sidebar">
-    <div class="sidebar-logo">
-      <div class="logo-title">&#x1F697; AutoGestão</div>
-      <div class="logo-sub">Compra &amp; Venda de Veículos</div>
+    <div class="sl">
+      <div class="t">&#x1F697; AutoGestao</div>
+      <div class="s">Compra &amp; Venda de Veiculos</div>
     </div>
-    <div class="sidebar-nav">
-      <div class="nav-section-label">Menu</div>
-      <div class="nav-item active" data-page="dashboard">
-        <span class="icon">&#x1F4CA;</span><span>Dashboard</span>
-      </div>
-      <div class="nav-item" data-page="estoque">
-        <span class="icon">&#x1F697;</span><span>Estoque</span>
-      </div>
-      <div class="nav-item" data-page="compras">
-        <span class="icon">&#x1F6D2;</span><span>Compras</span>
-      </div>
-      <div class="nav-item" data-page="vendas">
-        <span class="icon">&#x1F4B0;</span><span>Vendas</span>
-      </div>
-      <div class="nav-section-label">Análise</div>
-      <div class="nav-item" data-page="relatorios">
-        <span class="icon">&#x1F4C8;</span><span>Relatórios</span>
-      </div>
+    <div class="sn">
+      <div class="lbl">Menu</div>
+      <div class="ni active" data-page="dashboard"><span class="ic">&#x1F4CA;</span><span>Dashboard</span></div>
+      <div class="ni" data-page="estoque"><span class="ic">&#x1F697;</span><span>Estoque</span></div>
+      <div class="ni" data-page="compras"><span class="ic">&#x1F6D2;</span><span>Compras</span></div>
+      <div class="ni" data-page="vendas"><span class="ic">&#x1F4B0;</span><span>Vendas</span></div>
+      <div class="lbl">Analise</div>
+      <div class="ni" data-page="relatorios"><span class="ic">&#x1F4C8;</span><span>Relatorios</span></div>
     </div>
   </nav>
-
   <div id="main">
-    <div class="topbar">
-      <div class="topbar-title" id="topbar-title">Dashboard</div>
-      <div class="topbar-right">
-        <span class="text-muted" id="topbar-date"></span>
+    <div class="tb">
+      <div class="tb-t" id="tb-title">Dashboard</div>
+      <div><span class="mu" id="tb-date"></span></div>
+    </div>
+    <div class="pg" id="content"></div>
+  </div>
+</div>
+
+<div class="mo hidden" id="mo">
+  <div class="md">
+    <div class="mh">
+      <h3 id="m-title">-</h3>
+      <button class="mc" id="m-close">&#x2715;</button>
+    </div>
+    <div class="mb" id="m-body"></div>
+  </div>
+</div>
+
+<div class="mo hidden cm" id="co">
+  <div class="md">
+    <div class="mh">
+      <h3 id="c-title">Confirmar</h3>
+      <button class="mc" id="c-close">&#x2715;</button>
+    </div>
+    <div class="cfb">
+      <p id="c-msg"></p>
+      <div class="cfa">
+        <button class="btn bg2" id="c-cancel">Cancelar</button>
+        <button class="btn bd" id="c-ok">Excluir</button>
       </div>
     </div>
-    <div class="page" id="page-content"></div>
   </div>
 </div>
 
-<div class="modal-overlay hidden" id="modal-overlay">
-  <div class="modal" id="modal-box">
-    <div class="modal-header">
-      <h3 id="modal-title">Título</h3>
-      <button class="modal-close" onclick="Modal.close()">&#x2715;</button>
-    </div>
-    <div class="modal-body" id="modal-body"></div>
-  </div>
-</div>
-
-<div class="modal-overlay hidden confirm-modal" id="confirm-overlay">
-  <div class="modal" id="confirm-box">
-    <div class="modal-header">
-      <h3 id="confirm-title">Confirmar</h3>
-      <button class="modal-close" onclick="Confirm.cancel()">&#x2715;</button>
-    </div>
-    <div class="confirm-body">
-      <p id="confirm-msg"></p>
-      <div class="confirm-actions">
-        <button class="btn btn-ghost" onclick="Confirm.cancel()">Cancelar</button>
-        <button class="btn btn-danger" id="confirm-ok">Excluir</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div id="toast-container"></div>
+<div id="tc"></div>
 
 <script>
-'use strict';
-
-const STORE_KEY = 'autogestao_v1';
+var STORE_KEY = 'autogestao_v1';
+var state = loadState();
 
 function loadState() {
   try {
-    const raw = localStorage.getItem(STORE_KEY);
+    var raw = localStorage.getItem(STORE_KEY);
     if (raw) return JSON.parse(raw);
-  } catch {}
+  } catch(e) {}
   return { vehicles: [], purchases: [], sales: [] };
 }
 
 function saveState() {
   localStorage.setItem(STORE_KEY, JSON.stringify(state));
 }
-
-let state = loadState();
 
 function genId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
@@ -440,783 +213,721 @@ function fmtBRL(n) {
 }
 
 function fmtDate(d) {
-  if (!d) return '—';
-  const [y, m, day] = d.split('-');
-  return `${day}/${m}/${y}`;
+  if (!d) return '-';
+  var parts = d.split('-');
+  return parts[2] + '/' + parts[1] + '/' + parts[0];
 }
 
 function todayISO() {
   return new Date().toISOString().slice(0, 10);
 }
 
+function g(id) { return document.getElementById(id); }
+
 function vehicleLabel(v) {
-  if (!v) return '—';
-  return `${v.marca} ${v.modelo} ${v.ano}${v.placa ? ' • ' + v.placa : ''}`;
+  if (!v) return '-';
+  return v.marca + ' ' + v.modelo + ' ' + v.ano + (v.placa ? ' - ' + v.placa : '');
 }
 
 function vehicleById(id) {
-  return state.vehicles.find(v => v.id === id);
+  for (var i = 0; i < state.vehicles.length; i++) {
+    if (state.vehicles[i].id === id) return state.vehicles[i];
+  }
+  return null;
 }
 
 function purchaseByVehicle(vid) {
-  return state.purchases.find(p => p.vehicleId === vid);
+  for (var i = 0; i < state.purchases.length; i++) {
+    if (state.purchases[i].vehicleId === vid) return state.purchases[i];
+  }
+  return null;
 }
 
 function saleByVehicle(vid) {
-  return state.sales.find(s => s.vehicleId === vid);
+  for (var i = 0; i < state.sales.length; i++) {
+    if (state.sales[i].vehicleId === vid) return state.sales[i];
+  }
+  return null;
 }
 
-const Toast = {
-  show(msg, type = 'success') {
-    const el = document.createElement('div');
-    el.className = `toast toast-${type}`;
-    el.textContent = msg;
-    document.getElementById('toast-container').appendChild(el);
-    setTimeout(() => el.remove(), 3200);
-  }
-};
+function prop(obj, key, def) {
+  return (obj && obj[key] !== undefined && obj[key] !== null && obj[key] !== '') ? obj[key] : (def !== undefined ? def : '');
+}
 
-const Confirm = {
-  _resolve: null,
-  show(msg, title = 'Confirmar exclusão?') {
-    document.getElementById('confirm-title').textContent = title;
-    document.getElementById('confirm-msg').textContent = msg;
-    document.getElementById('confirm-overlay').classList.remove('hidden');
-    return new Promise(res => { this._resolve = res; });
-  },
-  ok() {
-    document.getElementById('confirm-overlay').classList.add('hidden');
-    if (this._resolve) this._resolve(true);
-    this._resolve = null;
-  },
-  cancel() {
-    document.getElementById('confirm-overlay').classList.add('hidden');
-    if (this._resolve) this._resolve(false);
-    this._resolve = null;
+function formToObj(form) {
+  var obj = {};
+  var elements = form.elements;
+  for (var i = 0; i < elements.length; i++) {
+    var el = elements[i];
+    if (el.name && !el.disabled) {
+      if (el.type === 'checkbox') { obj[el.name] = el.checked ? el.value : ''; }
+      else { obj[el.name] = el.value; }
+    }
   }
-};
-document.getElementById('confirm-ok').onclick = () => Confirm.ok();
+  return obj;
+}
 
-const Modal = {
-  open(title, html) {
-    document.getElementById('modal-title').textContent = title;
-    document.getElementById('modal-body').innerHTML = html;
-    document.getElementById('modal-overlay').classList.remove('hidden');
-  },
-  close() {
-    document.getElementById('modal-overlay').classList.add('hidden');
-    document.getElementById('modal-body').innerHTML = '';
-  }
-};
-document.getElementById('modal-overlay').addEventListener('click', e => {
-  if (e.target === document.getElementById('modal-overlay')) Modal.close();
-});
-document.getElementById('confirm-overlay').addEventListener('click', e => {
-  if (e.target === document.getElementById('confirm-overlay')) Confirm.cancel();
-});
+/* -- Toast -- */
+function showToast(msg, type) {
+  type = type || 'success';
+  var el = document.createElement('div');
+  el.className = 'ts ts-' + type.charAt(0);
+  el.textContent = msg;
+  g('tc').appendChild(el);
+  setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 3200);
+}
 
-let currentPage = 'dashboard';
+/* -- Confirm -- */
+var _confirmResolve = null;
+
+function showConfirm(msg, title) {
+  g('c-title').textContent = title || 'Confirmar exclusao?';
+  g('c-msg').textContent = msg;
+  g('co').classList.remove('hidden');
+  return new Promise(function(res) { _confirmResolve = res; });
+}
+
+function confirmOk() {
+  g('co').classList.add('hidden');
+  if (_confirmResolve) _confirmResolve(true);
+  _confirmResolve = null;
+}
+
+function confirmCancel() {
+  g('co').classList.add('hidden');
+  if (_confirmResolve) _confirmResolve(false);
+  _confirmResolve = null;
+}
+
+g('c-ok').onclick = confirmOk;
+g('c-cancel').onclick = confirmCancel;
+g('c-close').onclick = confirmCancel;
+g('co').onclick = function(e) { if (e.target === g('co')) confirmCancel(); };
+
+/* -- Modal -- */
+function openModal(title, html) {
+  g('m-title').textContent = title;
+  g('m-body').innerHTML = html;
+  g('mo').classList.remove('hidden');
+}
+
+function closeModal() {
+  g('mo').classList.add('hidden');
+  g('m-body').innerHTML = '';
+}
+
+g('m-close').onclick = closeModal;
+g('mo').onclick = function(e) { if (e.target === g('mo')) closeModal(); };
+
+/* -- Nav -- */
+var currentPage = 'dashboard';
+
+var PAGE_TITLES = {
+  dashboard: 'Dashboard',
+  estoque: 'Estoque de Veiculos',
+  compras: 'Registro de Compras',
+  vendas: 'Registro de Vendas',
+  relatorios: 'Relatorios Financeiros'
+};
 
 function navigate(page) {
   currentPage = page;
-  document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.page === page));
-  const titles = { dashboard: 'Dashboard', estoque: 'Estoque de Veículos', compras: 'Registro de Compras', vendas: 'Registro de Vendas', relatorios: 'Relatórios Financeiros' };
-  document.getElementById('topbar-title').textContent = titles[page] || page;
+  var items = document.querySelectorAll('.ni');
+  for (var i = 0; i < items.length; i++) {
+    if (items[i].dataset.page === page) items[i].classList.add('active');
+    else items[i].classList.remove('active');
+  }
+  g('tb-title').textContent = PAGE_TITLES[page] || page;
   renderPage(page);
 }
 
-document.querySelectorAll('.nav-item').forEach(el => {
-  el.addEventListener('click', () => navigate(el.dataset.page));
-});
+var navItems = document.querySelectorAll('.ni');
+for (var _i = 0; _i < navItems.length; _i++) {
+  (function(el) {
+    el.onclick = function() { navigate(el.dataset.page); };
+  })(navItems[_i]);
+}
 
 function renderPage(page) {
-  const container = document.getElementById('page-content');
-  switch (page) {
-    case 'dashboard': container.innerHTML = pageDashboard(); break;
-    case 'estoque':   container.innerHTML = pageEstoque(); break;
-    case 'compras':   container.innerHTML = pageCompras(); break;
-    case 'vendas':    container.innerHTML = pageVendas(); break;
-    case 'relatorios': container.innerHTML = pageRelatorios(); break;
-  }
+  var c = g('content');
+  if (page === 'dashboard') c.innerHTML = pageDashboard();
+  else if (page === 'estoque') c.innerHTML = pageEstoque();
+  else if (page === 'compras') c.innerHTML = pageCompras();
+  else if (page === 'vendas') c.innerHTML = pageVendas();
+  else if (page === 'relatorios') c.innerHTML = pageRelatorios();
 }
 
+/* -- Status badge -- */
+function statusBadge(s) {
+  if (s === 'disponivel') return '<span class="badge bg">Disponivel</span>';
+  if (s === 'reservado')  return '<span class="badge by">Reservado</span>';
+  if (s === 'vendido')    return '<span class="badge bb">Vendido</span>';
+  return '<span class="badge bgr">' + (s || '-') + '</span>';
+}
+
+/* ------------ DASHBOARD ------------ */
 function pageDashboard() {
-  const estoque = state.vehicles.filter(v => v.status === 'disponivel');
-  const reservado = state.vehicles.filter(v => v.status === 'reservado');
-  const vendidos = state.vehicles.filter(v => v.status === 'vendido');
+  var estoque = [], reservado = [], vendidos = [];
+  for (var i = 0; i < state.vehicles.length; i++) {
+    var v = state.vehicles[i];
+    if (v.status === 'disponivel') estoque.push(v);
+    else if (v.status === 'reservado') reservado.push(v);
+    else if (v.status === 'vendido') vendidos.push(v);
+  }
 
-  let totalInvestido = 0;
-  estoque.concat(reservado).forEach(v => {
-    const p = purchaseByVehicle(v.id);
+  var totalInvestido = 0;
+  var esRes = estoque.concat(reservado);
+  for (var j = 0; j < esRes.length; j++) {
+    var p = purchaseByVehicle(esRes[j].id);
     if (p) totalInvestido += Number(p.valor || 0);
-  });
+  }
 
-  let totalRecebido = 0, totalCusto = 0;
-  vendidos.forEach(v => {
-    const s = saleByVehicle(v.id);
-    const p = purchaseByVehicle(v.id);
-    if (s) totalRecebido += Number(s.valor || 0);
-    if (p) totalCusto += Number(p.valor || 0);
-  });
-  const lucro = totalRecebido - totalCusto;
+  var totalRecebido = 0, totalCusto = 0;
+  for (var k = 0; k < vendidos.length; k++) {
+    var sv = saleByVehicle(vendidos[k].id);
+    var pv = purchaseByVehicle(vendidos[k].id);
+    if (sv) totalRecebido += Number(sv.valor || 0);
+    if (pv) totalCusto += Number(pv.valor || 0);
+  }
+  var lucro = totalRecebido - totalCusto;
+  var lucroClass = lucro >= 0 ? 'lp' : 'ln';
+  var margemStr = vendidos.length > 0 ? ('Margem: ' + (totalCusto > 0 ? ((lucro/totalCusto)*100).toFixed(1) : '0') + '%') : 'Sem vendas';
 
-  const activity = [
-    ...state.purchases.map(p => ({ type: 'compra', date: p.data, valor: -Number(p.valor||0), label: vehicleLabel(vehicleById(p.vehicleId)), id: p.id })),
-    ...state.sales.map(s => ({ type: 'venda', date: s.data, valor: Number(s.valor||0), label: vehicleLabel(vehicleById(s.vehicleId)), id: s.id }))
-  ].sort((a, b) => (b.date||'').localeCompare(a.date||'')).slice(0, 8);
+  var actArr = [];
+  for (var pa = 0; pa < state.purchases.length; pa++) {
+    var pu = state.purchases[pa];
+    actArr.push({ type: 'compra', date: pu.data || '', valor: -Number(pu.valor||0), label: vehicleLabel(vehicleById(pu.vehicleId)) });
+  }
+  for (var sa = 0; sa < state.sales.length; sa++) {
+    var sl = state.sales[sa];
+    actArr.push({ type: 'venda', date: sl.data || '', valor: Number(sl.valor||0), label: vehicleLabel(vehicleById(sl.vehicleId)) });
+  }
+  actArr.sort(function(a,b){ return b.date > a.date ? 1 : -1; });
+  if (actArr.length > 8) actArr = actArr.slice(0, 8);
 
-  return `
-  <div class="kpi-grid">
-    <div class="kpi-card">
-      <div class="kpi-icon" style="background:#dbeafe">&#x1F697;</div>
-      <div>
-        <div class="label">Em Estoque</div>
-        <div class="value">${estoque.length}</div>
-        <div class="sub">${reservado.length} reservado(s)</div>
-      </div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-icon" style="background:#fee2e2">&#x1F6D2;</div>
-      <div>
-        <div class="label">Total Investido</div>
-        <div class="value" style="font-size:1.1rem">${fmtBRL(totalInvestido)}</div>
-        <div class="sub">em ${estoque.length + reservado.length} veículo(s)</div>
-      </div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-icon" style="background:#dcfce7">&#x2705;</div>
-      <div>
-        <div class="label">Total Vendido</div>
-        <div class="value" style="font-size:1.1rem">${fmtBRL(totalRecebido)}</div>
-        <div class="sub">${vendidos.length} venda(s)</div>
-      </div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-icon" style="background:${lucro >= 0 ? '#dcfce7' : '#fee2e2'}">&#x1F4B9;</div>
-      <div>
-        <div class="label">Lucro Total</div>
-        <div class="value ${lucro >= 0 ? 'lucro-positive' : 'lucro-negative'}" style="font-size:1.1rem">${fmtBRL(lucro)}</div>
-        <div class="sub">${vendidos.length > 0 ? 'Margem: ' + (totalCusto > 0 ? ((lucro/totalCusto)*100).toFixed(1) : '0') + '%' : 'Sem vendas'}</div>
-      </div>
-    </div>
-  </div>
+  var actHtml = '';
+  if (actArr.length === 0) {
+    actHtml = '<p class="mu" style="text-align:center;padding:20px 0">Nenhuma atividade ainda.</p>';
+  } else {
+    actHtml = '<ul class="rl">';
+    for (var ai = 0; ai < actArr.length; ai++) {
+      var a = actArr[ai];
+      var vc = a.type === 'compra' ? 'vr' : 'vg';
+      var sign = a.type === 'compra' ? '-' : '+';
+      actHtml += '<li class="ri"><div class="rd ' + a.type + '"></div>';
+      actHtml += '<div class="ri-i"><div class="ri-t">' + a.label + '</div>';
+      actHtml += '<div class="ri-s">' + (a.type === 'compra' ? 'Compra' : 'Venda') + ' - ' + fmtDate(a.date) + '</div></div>';
+      actHtml += '<div class="ri-v ' + vc + '">' + sign + fmtBRL(Math.abs(a.valor)) + '</div></li>';
+    }
+    actHtml += '</ul>';
+  }
 
-  <div class="dash-grid">
-    <div class="card">
-      <div class="card-header"><h2>Atividade Recente</h2></div>
-      <div class="card-body">
-        ${activity.length === 0 ? '<p class="text-muted" style="text-align:center;padding:20px 0">Nenhuma atividade ainda.</p>' : `
-        <ul class="recent-list">
-          ${activity.map(a => `
-          <li class="recent-item">
-            <div class="recent-dot ${a.type}"></div>
-            <div class="recent-info">
-              <div class="recent-title">${a.label}</div>
-              <div class="recent-sub">${a.type === 'compra' ? 'Compra' : 'Venda'} • ${fmtDate(a.date)}</div>
-            </div>
-            <div class="recent-val ${a.type === 'compra' ? 'val-red' : 'val-green'}">${a.type === 'compra' ? '-' : '+'}${fmtBRL(Math.abs(a.valor))}</div>
-          </li>`).join('')}
-        </ul>`}
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-header"><h2>Resumo do Estoque</h2></div>
-      <div class="card-body">
-        ${state.vehicles.length === 0 ? '<p class="text-muted" style="text-align:center;padding:20px 0">Nenhum veículo cadastrado.</p>' : `
-        <table><thead><tr><th>Veículo</th><th>Status</th><th class="text-right">Custo</th></tr></thead><tbody>
-          ${state.vehicles.slice(0,6).map(v => {
-            const p = purchaseByVehicle(v.id);
-            return `<tr>
-              <td><div style="font-weight:500">${v.marca} ${v.modelo}</div><div class="text-muted">${v.ano}${v.placa ? ' • '+v.placa : ''}</div></td>
-              <td>${statusBadge(v.status)}</td>
-              <td class="text-right">${p ? fmtBRL(p.valor) : '—'}</td>
-            </tr>`;
-          }).join('')}
-        </tbody></table>
-        ${state.vehicles.length > 6 ? `<p class="text-muted mt-4" style="text-align:center">+${state.vehicles.length-6} veículo(s) — <a href="#" onclick="navigate('estoque');return false">ver todos</a></p>` : ''}`}
-      </div>
-    </div>
-  </div>`;
+  var sumHtml = '';
+  if (state.vehicles.length === 0) {
+    sumHtml = '<p class="mu" style="text-align:center;padding:20px 0">Nenhum veiculo cadastrado.</p>';
+    sumHtml += '<div style="text-align:center;margin-top:12px"><button class="btn bp" onclick="navigate(\'estoque\')">+ Cadastrar primeiro veiculo</button></div>';
+  } else {
+    sumHtml = '<table><thead><tr><th>Veiculo</th><th>Status</th><th class="tr">Custo</th></tr></thead><tbody>';
+    var maxShow = Math.min(6, state.vehicles.length);
+    for (var vi = 0; vi < maxShow; vi++) {
+      var vv = state.vehicles[vi];
+      var pp = purchaseByVehicle(vv.id);
+      sumHtml += '<tr><td><div style="font-weight:500">' + vv.marca + ' ' + vv.modelo + '</div>';
+      sumHtml += '<div class="mu">' + vv.ano + (vv.placa ? ' - ' + vv.placa : '') + '</div></td>';
+      sumHtml += '<td>' + statusBadge(vv.status) + '</td>';
+      sumHtml += '<td class="tr">' + (pp ? fmtBRL(pp.valor) : '-') + '</td></tr>';
+    }
+    sumHtml += '</tbody></table>';
+  }
+
+  return '<div class="kgrid">' +
+    '<div class="kc"><div class="ki" style="background:#dbeafe">&#x1F697;</div><div><div class="lb">Em Estoque</div><div class="vl">' + estoque.length + '</div><div class="sb">' + reservado.length + ' reservado(s)</div></div></div>' +
+    '<div class="kc"><div class="ki" style="background:#fee2e2">&#x1F6D2;</div><div><div class="lb">Total Investido</div><div class="vl" style="font-size:1.1rem">' + fmtBRL(totalInvestido) + '</div><div class="sb">em ' + (estoque.length + reservado.length) + ' veiculo(s)</div></div></div>' +
+    '<div class="kc"><div class="ki" style="background:#dcfce7">&#x2705;</div><div><div class="lb">Total Vendido</div><div class="vl" style="font-size:1.1rem">' + fmtBRL(totalRecebido) + '</div><div class="sb">' + vendidos.length + ' venda(s)</div></div></div>' +
+    '<div class="kc"><div class="ki" style="background:' + (lucro >= 0 ? '#dcfce7' : '#fee2e2') + '">&#x1F4B9;</div><div><div class="lb">Lucro Total</div><div class="vl ' + lucroClass + '" style="font-size:1.1rem">' + fmtBRL(lucro) + '</div><div class="sb">' + margemStr + '</div></div></div>' +
+    '</div>' +
+    '<div class="dg">' +
+    '<div class="card"><div class="ch"><h2>Atividade Recente</h2></div><div class="cb">' + actHtml + '</div></div>' +
+    '<div class="card"><div class="ch"><h2>Resumo do Estoque</h2><button class="btn bp bsm" onclick="navigate(\'estoque\')">Ver tudo</button></div><div class="cb">' + sumHtml + '</div></div>' +
+    '</div>';
 }
 
-let estoqueFilter = { q: '', status: '' };
+/* ------------ ESTOQUE ------------ */
+var estoqueQ = '', estoqueStatus = '';
 
 function pageEstoque() {
-  let list = state.vehicles.filter(v => {
-    const q = estoqueFilter.q.toLowerCase();
-    const match = !q || `${v.marca} ${v.modelo} ${v.ano} ${v.placa || ''} ${v.cor || ''}`.toLowerCase().includes(q);
-    const s = !estoqueFilter.status || v.status === estoqueFilter.status;
-    return match && s;
-  });
+  var list = [];
+  for (var i = 0; i < state.vehicles.length; i++) {
+    var v = state.vehicles[i];
+    var q = estoqueQ.toLowerCase();
+    var match = !q || (v.marca + ' ' + v.modelo + ' ' + v.ano + ' ' + (v.placa||'') + ' ' + (v.cor||'')).toLowerCase().indexOf(q) !== -1;
+    var sm = !estoqueStatus || v.status === estoqueStatus;
+    if (match && sm) list.push(v);
+  }
 
-  return `
-  <div class="search-bar">
-    <div class="search-input-wrap">
-      <span class="search-icon">&#x1F50D;</span>
-      <input type="text" placeholder="Buscar por marca, modelo, placa..." value="${estoqueFilter.q}" oninput="estoqueFilter.q=this.value;renderPage('estoque')">
-    </div>
-    <select class="filter-select" onchange="estoqueFilter.status=this.value;renderPage('estoque')">
-      <option value="" ${!estoqueFilter.status?'selected':''}>Todos os status</option>
-      <option value="disponivel" ${estoqueFilter.status==='disponivel'?'selected':''}>Disponível</option>
-      <option value="reservado" ${estoqueFilter.status==='reservado'?'selected':''}>Reservado</option>
-      <option value="vendido" ${estoqueFilter.status==='vendido'?'selected':''}>Vendido</option>
-    </select>
-    <button class="btn btn-primary" onclick="openVehicleForm()">&#xFF0B; Novo Veículo</button>
-  </div>
-  <div class="card">
-    <div class="card-header">
-      <h2>Veículos (${list.length})</h2>
-    </div>
-    <div class="table-wrap">
-      ${list.length === 0 ? `<div class="empty-state"><div class="icon">&#x1F697;</div><p>${state.vehicles.length === 0 ? 'Nenhum veículo cadastrado. Clique em "Novo Veículo" para começar.' : 'Nenhum veículo encontrado.'}</p></div>` : `
-      <table>
-        <thead><tr>
-          <th>Veículo</th><th>Placa</th><th>Cor</th><th>KM</th>
-          <th>Custo</th><th>Venda</th><th>Lucro</th><th>Status</th><th></th>
-        </tr></thead>
-        <tbody>
-          ${list.map(v => {
-            const p = purchaseByVehicle(v.id);
-            const s = saleByVehicle(v.id);
-            const custo = Number(p?.valor || 0);
-            const venda = Number(s?.valor || 0);
-            const lucro = s ? venda - custo : null;
-            return `<tr>
-              <td>
-                <div style="font-weight:500">${v.marca} ${v.modelo}</div>
-                <div class="text-muted">${v.ano} • ${v.combustivel || 'Flex'}</div>
-              </td>
-              <td><span class="text-mono">${v.placa || '—'}</span></td>
-              <td>${v.cor || '—'}</td>
-              <td>${v.km ? Number(v.km).toLocaleString('pt-BR') + ' km' : '—'}</td>
-              <td>${custo ? fmtBRL(custo) : '—'}</td>
-              <td>${venda ? fmtBRL(venda) : '—'}</td>
-              <td>${lucro !== null ? `<span class="${lucro >= 0 ? 'lucro-positive' : 'lucro-negative'}">${fmtBRL(lucro)}</span>` : '—'}</td>
-              <td>${statusBadge(v.status)}</td>
-              <td>
-                <div class="flex gap-2">
-                  <button class="btn btn-ghost btn-sm btn-icon" title="Editar" onclick="openVehicleForm('${v.id}')">&#x270F;&#xFE0F;</button>
-                  <button class="btn btn-ghost btn-sm btn-icon" title="Excluir" onclick="deleteVehicle('${v.id}')">&#x1F5D1;</button>
-                </div>
-              </td>
-            </tr>`;
-          }).join('')}
-        </tbody>
-      </table>`}
-    </div>
-  </div>`;
-}
+  var rows = '';
+  for (var j = 0; j < list.length; j++) {
+    var vv = list[j];
+    var p = purchaseByVehicle(vv.id);
+    var s = saleByVehicle(vv.id);
+    var custo = Number(p ? p.valor : 0);
+    var venda = Number(s ? s.valor : 0);
+    var lucro = s ? venda - custo : null;
+    var lucroStr = lucro !== null ? '<span class="' + (lucro >= 0 ? 'lp' : 'ln') + '">' + fmtBRL(lucro) + '</span>' : '-';
+    rows += '<tr>' +
+      '<td><div style="font-weight:500">' + vv.marca + ' ' + vv.modelo + '</div><div class="mu">' + vv.ano + ' - ' + (vv.combustivel || 'Flex') + '</div></td>' +
+      '<td><span class="tm">' + (vv.placa || '-') + '</span></td>' +
+      '<td>' + (vv.cor || '-') + '</td>' +
+      '<td>' + (vv.km ? Number(vv.km).toLocaleString('pt-BR') + ' km' : '-') + '</td>' +
+      '<td>' + (custo ? fmtBRL(custo) : '-') + '</td>' +
+      '<td>' + (venda ? fmtBRL(venda) : '-') + '</td>' +
+      '<td>' + lucroStr + '</td>' +
+      '<td>' + statusBadge(vv.status) + '</td>' +
+      '<td><div class="fl g2">' +
+      '<button class="btn bg2 bsm bic" title="Editar" onclick="openVehicleForm(\'' + vv.id + \')">&#x270F;&#xFE0F;</button>' +
+      '<button class="btn bg2 bsm bic" title="Excluir" onclick="deleteVehicle(\'' + vv.id + \')">&#x1F5D1;</button>' +
+      '</div></td></tr>';
+  }
 
-function statusBadge(s) {
-  const map = { disponivel: ['badge-green', 'Disponível'], reservado: ['badge-yellow', 'Reservado'], vendido: ['badge-blue', 'Vendido'] };
-  const [cls, label] = map[s] || ['badge-gray', s];
-  return `<span class="badge ${cls}">${label}</span>`;
+  var tableHtml = '';
+  if (list.length === 0) {
+    tableHtml = '<div class="es"><div class="ic">&#x1F697;</div><p>' + (state.vehicles.length === 0 ? 'Nenhum veiculo cadastrado. Clique em "+ Novo Veiculo" para comecar.' : 'Nenhum veiculo encontrado.') + '</p></div>';
+  } else {
+    tableHtml = '<table><thead><tr><th>Veiculo</th><th>Placa</th><th>Cor</th><th>KM</th><th>Custo</th><th>Venda</th><th>Lucro</th><th>Status</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
+  }
+
+  var selOpts = '<option value=""' + (!estoqueStatus ? ' selected' : '') + '>Todos os status</option>' +
+    '<option value="disponivel"' + (estoqueStatus === 'disponivel' ? ' selected' : '') + '>Disponivel</option>' +
+    '<option value="reservado"' + (estoqueStatus === 'reservado' ? ' selected' : '') + '>Reservado</option>' +
+    '<option value="vendido"' + (estoqueStatus === 'vendido' ? ' selected' : '') + '>Vendido</option>';
+
+  return '<div class="sb-w">' +
+    '<div class="si-w"><span class="si-ic">&#x1F50D;</span><input type="text" placeholder="Buscar por marca, modelo, placa..." value="' + estoqueQ + '" oninput="estoqueQ=this.value;renderPage(\'estoque\')"></div>' +
+    '<select class="fs" onchange="estoqueStatus=this.value;renderPage(\'estoque\')">" + selOpts + "</select>' +
+    '<button class="btn bp" onclick="openVehicleForm(\'\')>+ Novo Veiculo</button>' +
+    '</div>' +
+    '<div class="card"><div class="ch"><h2>Veiculos (' + list.length + ')</h2></div><div class="tw">' + tableHtml + '</div></div>';
 }
 
 function openVehicleForm(id) {
-  const v = id ? vehicleById(id) : null;
-  const title = v ? 'Editar Veículo' : 'Novo Veículo';
-  const html = `
-  <form id="vehicle-form" onsubmit="saveVehicle(event,'${id||''}')">
-    <div class="form-grid">
-      <div class="field">
-        <label>Marca *</label>
-        <input type="text" name="marca" value="${v?.marca||''}" placeholder="Ex: Fiat, VW, Toyota" required>
-      </div>
-      <div class="field">
-        <label>Modelo *</label>
-        <input type="text" name="modelo" value="${v?.modelo||''}" placeholder="Ex: Uno, Gol, Corolla" required>
-      </div>
-      <div class="field">
-        <label>Ano *</label>
-        <input type="number" name="ano" value="${v?.ano||''}" placeholder="2020" min="1950" max="2030" required>
-      </div>
-      <div class="field">
-        <label>Placa</label>
-        <input type="text" name="placa" value="${v?.placa||''}" placeholder="ABC-1234" maxlength="10">
-      </div>
-      <div class="field">
-        <label>Cor</label>
-        <input type="text" name="cor" value="${v?.cor||''}" placeholder="Branco, Preto...">
-      </div>
-      <div class="field">
-        <label>Combustível</label>
-        <select name="combustivel">
-          ${['Flex','Gasolina','Diesel','Elétrico','Híbrido','GNV'].map(c => `<option ${(v?.combustivel||'Flex')===c?'selected':''}>${c}</option>`).join('')}
-        </select>
-      </div>
-      <div class="field">
-        <label>Quilometragem (km)</label>
-        <input type="number" name="km" value="${v?.km||''}" placeholder="0" min="0">
-      </div>
-      <div class="field">
-        <label>Chassi (RENAVAM/Chassi)</label>
-        <input type="text" name="chassi" value="${v?.chassi||''}" placeholder="Opcional">
-      </div>
-      <div class="field">
-        <label>Status</label>
-        <select name="status">
-          <option value="disponivel" ${(v?.status||'disponivel')==='disponivel'?'selected':''}>Disponível</option>
-          <option value="reservado" ${v?.status==='reservado'?'selected':''}>Reservado</option>
-          <option value="vendido" ${v?.status==='vendido'?'selected':''}>Vendido</option>
-        </select>
-      </div>
-      <div class="field form-col-full">
-        <label>Observações</label>
-        <textarea name="obs" placeholder="Acessórios, revisões, histórico...">${v?.obs||''}</textarea>
-      </div>
-    </div>
-    <div class="form-actions">
-      <button type="button" class="btn btn-ghost" onclick="Modal.close()">Cancelar</button>
-      <button type="submit" class="btn btn-primary">&#x1F4BE; Salvar</button>
-    </div>
-  </form>`;
-  Modal.open(title, html);
-}
-
-function saveVehicle(e, id) {
-  e.preventDefault();
-  const fd = new FormData(e.target);
-  const data = Object.fromEntries(fd.entries());
-  if (id) {
-    const idx = state.vehicles.findIndex(v => v.id === id);
-    state.vehicles[idx] = { ...state.vehicles[idx], ...data };
-    Toast.show('Veículo atualizado!');
-  } else {
-    state.vehicles.push({ id: genId(), ...data });
-    Toast.show('Veículo cadastrado!');
+  var v = id ? vehicleById(id) : null;
+  var title = v ? 'Editar Veiculo' : 'Novo Veiculo';
+  var fuels = ['Flex','Gasolina','Diesel','Eletrico','Hibrido','GNV'];
+  var fuelOpts = '';
+  for (var i = 0; i < fuels.length; i++) {
+    var sel = ((v && v.combustivel) || 'Flex') === fuels[i] ? ' selected' : '';
+    fuelOpts += '<option' + sel + '>' + fuels[i] + '</option>';
   }
-  saveState(); Modal.close(); renderPage('estoque');
+  var html =
+    '<form id="vf" onsubmit="saveVehicle(event)">' +
+    '<input type="hidden" name="vid" value="' + (id || '') + '">' +
+    '<div class="fg">' +
+    '<div class="fd"><label>Marca *</label><input type="text" name="marca" value="' + prop(v,'marca') + '" placeholder="Ex: Fiat, VW, Toyota" required></div>' +
+    '<div class="fd"><label>Modelo *</label><input type="text" name="modelo" value="' + prop(v,'modelo') + '" placeholder="Ex: Uno, Gol, Corolla" required></div>' +
+    '<div class="fd"><label>Ano *</label><input type="number" name="ano" value="' + prop(v,'ano') + '" placeholder="2020" min="1950" max="2030" required></div>' +
+    '<div class="fd"><label>Placa</label><input type="text" name="placa" value="' + prop(v,'placa') + '" placeholder="ABC-1234" maxlength="10"></div>' +
+    '<div class="fd"><label>Cor</label><input type="text" name="cor" value="' + prop(v,'cor') + '" placeholder="Branco, Preto..."></div>' +
+    '<div class="fd"><label>Combustivel</label><select name="combustivel">' + fuelOpts + '</select></div>' +
+    '<div class="fd"><label>Quilometragem (km)</label><input type="number" name="km" value="' + prop(v,'km') + '" placeholder="0" min="0"></div>' +
+    '<div class="fd"><label>Chassi / RENAVAM</label><input type="text" name="chassi" value="' + prop(v,'chassi') + '" placeholder="Opcional"></div>' +
+    '<div class="fd"><label>Status</label><select name="status">' +
+      '<option value="disponivel"' + (prop(v,'status','disponivel') === 'disponivel' ? ' selected' : '') + '>Disponivel</option>' +
+      '<option value="reservado"' + (prop(v,'status') === 'reservado' ? ' selected' : '') + '>Reservado</option>' +
+      '<option value="vendido"' + (prop(v,'status') === 'vendido' ? ' selected' : '') + '>Vendido</option>' +
+    '</select></div>' +
+    '<div class="fd ffc"><label>Observacoes</label><textarea name="obs">' + prop(v,'obs') + '</textarea></div>' +
+    '</div>' +
+    '<div class="fa"><button type="button" class="btn bg2" onclick="closeModal()">Cancelar</button><button type="submit" class="btn bp">&#x1F4BE; Salvar</button></div>' +
+    '</form>';
+  openModal(title, html);
 }
 
-async function deleteVehicle(id) {
-  const v = vehicleById(id);
-  const ok = await Confirm.show(`Excluir "${vehicleLabel(v)}"? Os registros de compra e venda também serão removidos.`);
-  if (!ok) return;
-  state.vehicles = state.vehicles.filter(x => x.id !== id);
-  state.purchases = state.purchases.filter(x => x.vehicleId !== id);
-  state.sales = state.sales.filter(x => x.vehicleId !== id);
-  saveState(); Toast.show('Veículo excluído.', 'error'); renderPage('estoque');
+function saveVehicle(e) {
+  e.preventDefault();
+  var d = formToObj(e.target);
+  var id = d.vid;
+  delete d.vid;
+  if (id) {
+    for (var i = 0; i < state.vehicles.length; i++) {
+      if (state.vehicles[i].id === id) { state.vehicles[i] = Object.assign({}, state.vehicles[i], d); break; }
+    }
+    showToast('Veiculo atualizado!');
+  } else {
+    d.id = genId();
+    state.vehicles.push(d);
+    showToast('Veiculo cadastrado!');
+  }
+  saveState(); closeModal(); renderPage('estoque');
 }
 
-let comprasFilter = { q: '' };
+function deleteVehicle(id) {
+  var v = vehicleById(id);
+  showConfirm('Excluir "' + vehicleLabel(v) + '"? Os registros de compra e venda tambem serao removidos.').then(function(ok) {
+    if (!ok) return;
+    state.vehicles = state.vehicles.filter(function(x) { return x.id !== id; });
+    state.purchases = state.purchases.filter(function(x) { return x.vehicleId !== id; });
+    state.sales = state.sales.filter(function(x) { return x.vehicleId !== id; });
+    saveState(); showToast('Veiculo excluido.', 'error'); renderPage('estoque');
+  });
+}
+
+/* ------------ COMPRAS ------------ */
+var comprasQ = '';
 
 function pageCompras() {
-  const list = state.purchases.filter(p => {
-    const v = vehicleById(p.vehicleId);
-    const q = comprasFilter.q.toLowerCase();
-    return !q || vehicleLabel(v).toLowerCase().includes(q) || (p.procedencia||'').toLowerCase().includes(q);
-  }).sort((a, b) => (b.data||'').localeCompare(a.data||''));
+  var list = [];
+  for (var i = 0; i < state.purchases.length; i++) {
+    var p = state.purchases[i];
+    var v = vehicleById(p.vehicleId);
+    var q = comprasQ.toLowerCase();
+    if (!q || vehicleLabel(v).toLowerCase().indexOf(q) !== -1 || (p.procedencia||'').toLowerCase().indexOf(q) !== -1) {
+      list.push(p);
+    }
+  }
+  list.sort(function(a,b){ return (b.data||'') > (a.data||'') ? 1 : -1; });
 
-  const total = list.reduce((s, p) => s + Number(p.valor || 0), 0);
+  var total = 0;
+  for (var t = 0; t < list.length; t++) total += Number(list[t].valor || 0);
 
-  return `
-  <div class="search-bar">
-    <div class="search-input-wrap">
-      <span class="search-icon">&#x1F50D;</span>
-      <input type="text" placeholder="Buscar por veículo ou procedência..." value="${comprasFilter.q}" oninput="comprasFilter.q=this.value;renderPage('compras')">
-    </div>
-    <button class="btn btn-primary" onclick="openCompraForm()">&#xFF0B; Registrar Compra</button>
-  </div>
-  <div class="card">
-    <div class="card-header">
-      <h2>Compras (${list.length})</h2>
-      <span style="font-weight:600;color:var(--danger)">${fmtBRL(total)}</span>
-    </div>
-    <div class="table-wrap">
-      ${list.length === 0 ? `<div class="empty-state"><div class="icon">&#x1F6D2;</div><p>${state.purchases.length === 0 ? 'Nenhuma compra registrada. Clique em "Registrar Compra" para começar.' : 'Nenhuma compra encontrada.'}</p></div>` : `
-      <table>
-        <thead><tr><th>Data</th><th>Veículo</th><th>Procedência</th><th>Forma Pgto</th><th class="text-right">Valor Pago</th><th>Obs.</th><th></th></tr></thead>
-        <tbody>
-          ${list.map(p => {
-            const v = vehicleById(p.vehicleId);
-            return `<tr>
-              <td>${fmtDate(p.data)}</td>
-              <td>
-                <div style="font-weight:500">${vehicleLabel(v)}</div>
-                <div>${v ? statusBadge(v.status) : '<span class="badge badge-gray">Removido</span>'}</div>
-              </td>
-              <td>${p.procedencia || '—'}</td>
-              <td>${p.formaPgto || '—'}</td>
-              <td class="text-right font-bold" style="color:var(--danger)">${fmtBRL(p.valor)}</td>
-              <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${p.obs||''}">${p.obs || '—'}</td>
-              <td>
-                <div class="flex gap-2">
-                  <button class="btn btn-ghost btn-sm btn-icon" onclick="openCompraForm('${p.id}')">&#x270F;&#xFE0F;</button>
-                  <button class="btn btn-ghost btn-sm btn-icon" onclick="deleteCompra('${p.id}')">&#x1F5D1;</button>
-                </div>
-              </td>
-            </tr>`;
-          }).join('')}
-        </tbody>
-      </table>`}
-    </div>
-  </div>`;
+  var rows = '';
+  for (var j = 0; j < list.length; j++) {
+    var pu = list[j];
+    var vv = vehicleById(pu.vehicleId);
+    rows += '<tr>' +
+      '<td>' + fmtDate(pu.data) + '</td>' +
+      '<td><div style="font-weight:500">' + vehicleLabel(vv) + '</div><div>' + (vv ? statusBadge(vv.status) : '<span class="badge bgr">Removido</span>') + '</div></td>' +
+      '<td>' + (pu.procedencia || '-') + '</td>' +
+      '<td>' + (pu.formaPgto || '-') + '</td>' +
+      '<td class="tr fb" style="color:var(--danger)">' + fmtBRL(pu.valor) + '</td>' +
+      '<td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (pu.obs || '-') + '</td>' +
+      '<td><div class="fl g2">' +
+      '<button class="btn bg2 bsm bic" onclick="openCompraForm(\'' + pu.id + \')">&#x270F;&#xFE0F;</button>' +
+      '<button class="btn bg2 bsm bic" onclick="deleteCompra(\'' + pu.id + \')">&#x1F5D1;</button>' +
+      '</div></td></tr>';
+  }
+
+  var tableHtml = list.length === 0
+    ? '<div class="es"><div class="ic">&#x1F6D2;</div><p>' + (state.purchases.length === 0 ? 'Nenhuma compra registrada. Clique em "+ Registrar Compra" para comecar.' : 'Nenhuma compra encontrada.') + '</p></div>'
+    : '<table><thead><tr><th>Data</th><th>Veiculo</th><th>Procedencia</th><th>Forma Pgto</th><th class="tr">Valor Pago</th><th>Obs.</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
+
+  return '<div class="sb-w">' +
+    '<div class="si-w"><span class="si-ic">&#x1F50D;</span><input type="text" placeholder="Buscar por veiculo ou procedencia..." value="' + comprasQ + '" oninput="comprasQ=this.value;renderPage(\'compras\')"></div>' +
+    '<button class="btn bp" onclick="openCompraForm(\'\')>+ Registrar Compra</button>' +
+    '</div>' +
+    '<div class="card"><div class="ch"><h2>Compras (' + list.length + ')</h2><span style="font-weight:600;color:var(--danger)">' + fmtBRL(total) + '</span></div>' +
+    '<div class="tw">' + tableHtml + '</div></div>';
 }
 
 function openCompraForm(id) {
-  const p = id ? state.purchases.find(x => x.id === id) : null;
-  const disponiveisParaCompra = state.vehicles.filter(v => !p && !purchaseByVehicle(v.id));
-  const vehiclesOptions = p
-    ? state.vehicles.map(v => `<option value="${v.id}" ${v.id === p.vehicleId ? 'selected' : ''}>${vehicleLabel(v)}</option>`).join('')
-    : disponiveisParaCompra.map(v => `<option value="${v.id}">${vehicleLabel(v)}</option>`).join('');
+  var p = null;
+  for (var i = 0; i < state.purchases.length; i++) { if (state.purchases[i].id === id) { p = state.purchases[i]; break; } }
 
-  const html = `
-  <form id="compra-form" onsubmit="saveCompra(event,'${id||''}')">
-    <div class="form-grid">
-      <div class="field form-col-full">
-        <label>Veículo *</label>
-        <select name="vehicleId" required ${p ? 'disabled' : ''}>
-          <option value="">Selecione um veículo</option>
-          ${vehiclesOptions}
-        </select>
-        ${!p && disponiveisParaCompra.length === 0 ? '<span class="hint">Todos os veículos já têm compra registrada. Cadastre um novo veículo primeiro.</span>' : ''}
-        ${p ? `<input type="hidden" name="vehicleId" value="${p.vehicleId}">` : ''}
-      </div>
-      <div class="field">
-        <label>Data da Compra *</label>
-        <input type="date" name="data" value="${p?.data || todayISO()}" required>
-      </div>
-      <div class="field">
-        <label>Valor Pago (R$) *</label>
-        <input type="number" name="valor" value="${p?.valor||''}" placeholder="0,00" min="0" step="0.01" required>
-      </div>
-      <div class="field">
-        <label>Procedência</label>
-        <select name="procedencia">
-          ${['','Particular','Leilão','Concessionária','Loja','Outro'].map(x => `<option ${(p?.procedencia||'')=== x?'selected':''}>${x}</option>`).join('')}
-        </select>
-      </div>
-      <div class="field">
-        <label>Forma de Pagamento</label>
-        <select name="formaPgto">
-          ${['','Dinheiro','PIX','Transferência','Cheque','Financiamento','Outro'].map(x => `<option ${(p?.formaPgto||'')=== x?'selected':''}>${x}</option>`).join('')}
-        </select>
-      </div>
-      <div class="field">
-        <label>Custo Extra (R$)</label>
-        <input type="number" name="custoExtra" value="${p?.custoExtra||''}" placeholder="Funilaria, revisão..." min="0" step="0.01">
-        <span class="hint">Despesas adicionais com o veículo</span>
-      </div>
-      <div class="field form-col-full">
-        <label>Observações</label>
-        <textarea name="obs" placeholder="Detalhes da negociação, condição do veículo...">${p?.obs||''}</textarea>
-      </div>
-    </div>
-    <div class="form-actions">
-      <button type="button" class="btn btn-ghost" onclick="Modal.close()">Cancelar</button>
-      <button type="submit" class="btn btn-primary">&#x1F4BE; Salvar</button>
-    </div>
-  </form>`;
-  Modal.open(p ? 'Editar Compra' : 'Registrar Compra', html);
-}
-
-function saveCompra(e, id) {
-  e.preventDefault();
-  const fd = new FormData(e.target);
-  const data = Object.fromEntries(fd.entries());
-  if (!data.vehicleId) { Toast.show('Selecione um veículo.', 'error'); return; }
-  if (id) {
-    const idx = state.purchases.findIndex(x => x.id === id);
-    state.purchases[idx] = { ...state.purchases[idx], ...data };
-    Toast.show('Compra atualizada!');
+  var vOpts = '';
+  if (p) {
+    for (var j = 0; j < state.vehicles.length; j++) {
+      var vv = state.vehicles[j];
+      vOpts += '<option value="' + vv.id + '"' + (vv.id === p.vehicleId ? ' selected' : '') + '>' + vehicleLabel(vv) + '</option>';
+    }
   } else {
-    if (purchaseByVehicle(data.vehicleId)) { Toast.show('Este veículo já tem uma compra registrada.', 'error'); return; }
-    state.purchases.push({ id: genId(), ...data });
-    Toast.show('Compra registrada!');
+    var used = {};
+    for (var k = 0; k < state.purchases.length; k++) used[state.purchases[k].vehicleId] = true;
+    for (var m = 0; m < state.vehicles.length; m++) {
+      var vm = state.vehicles[m];
+      if (!used[vm.id]) vOpts += '<option value="' + vm.id + '">' + vehicleLabel(vm) + '</option>';
+    }
   }
-  saveState(); Modal.close(); renderPage('compras');
+
+  var procs = ['','Particular','Leilao','Concessionaria','Loja','Outro'];
+  var pgtos = ['','Dinheiro','PIX','Transferencia','Cheque','Financiamento','Outro'];
+  var procOpts = '', pgtoOpts = '';
+  for (var pi = 0; pi < procs.length; pi++) { procOpts += '<option' + (prop(p,'procedencia') === procs[pi] ? ' selected' : '') + '>' + procs[pi] + '</option>'; }
+  for (var gi = 0; gi < pgtos.length; gi++) { pgtoOpts += '<option' + (prop(p,'formaPgto') === pgtos[gi] ? ' selected' : '') + '>' + pgtos[gi] + '</option>'; }
+
+  var html =
+    '<form id="cf" onsubmit="saveCompra(event)">' +
+    '<input type="hidden" name="cid" value="' + (id || '') + '">' +
+    '<div class="fg">' +
+    '<div class="fd ffc"><label>Veiculo *</label>' +
+    '<select name="vehicleId" required' + (p ? ' disabled' : '') + '>' +
+    '<option value="">Selecione um veiculo</option>' + vOpts + '</select>' +
+    (p ? '<input type="hidden" name="vehicleId" value="' + p.vehicleId + '">' : '') +
+    '</div>' +
+    '<div class="fd"><label>Data da Compra *</label><input type="date" name="data" value="' + prop(p,'data',todayISO()) + '" required></div>' +
+    '<div class="fd"><label>Valor Pago (R$) *</label><input type="number" name="valor" value="' + prop(p,'valor') + '" placeholder="0.00" min="0" step="0.01" required></div>' +
+    '<div class="fd"><label>Procedencia</label><select name="procedencia">' + procOpts + '</select></div>' +
+    '<div class="fd"><label>Forma de Pagamento</label><select name="formaPgto">' + pgtoOpts + '</select></div>' +
+    '<div class="fd"><label>Custo Extra (R$)</label><input type="number" name="custoExtra" value="' + prop(p,'custoExtra') + '" placeholder="Funilaria, revisao..." min="0" step="0.01"><span class="ht">Despesas adicionais</span></div>' +
+    '<div class="fd ffc"><label>Observacoes</label><textarea name="obs">' + prop(p,'obs') + '</textarea></div>' +
+    '</div>' +
+    '<div class="fa"><button type="button" class="btn bg2" onclick="closeModal()">Cancelar</button><button type="submit" class="btn bp">&#x1F4BE; Salvar</button></div>' +
+    '</form>';
+  openModal(p ? 'Editar Compra' : 'Registrar Compra', html);
 }
 
-async function deleteCompra(id) {
-  const ok = await Confirm.show('Excluir este registro de compra?');
-  if (!ok) return;
-  state.purchases = state.purchases.filter(x => x.id !== id);
-  saveState(); Toast.show('Compra excluída.', 'error'); renderPage('compras');
+function saveCompra(e) {
+  e.preventDefault();
+  var d = formToObj(e.target);
+  var id = d.cid;
+  delete d.cid;
+  if (!d.vehicleId) { showToast('Selecione um veiculo.', 'error'); return; }
+  if (id) {
+    for (var i = 0; i < state.purchases.length; i++) {
+      if (state.purchases[i].id === id) { state.purchases[i] = Object.assign({}, state.purchases[i], d); break; }
+    }
+    showToast('Compra atualizada!');
+  } else {
+    if (purchaseByVehicle(d.vehicleId)) { showToast('Este veiculo ja tem uma compra registrada.', 'error'); return; }
+    d.id = genId();
+    state.purchases.push(d);
+    showToast('Compra registrada!');
+  }
+  saveState(); closeModal(); renderPage('compras');
 }
 
-let vendasFilter = { q: '' };
+function deleteCompra(id) {
+  showConfirm('Excluir este registro de compra?').then(function(ok) {
+    if (!ok) return;
+    state.purchases = state.purchases.filter(function(x) { return x.id !== id; });
+    saveState(); showToast('Compra excluida.', 'error'); renderPage('compras');
+  });
+}
+
+/* ------------ VENDAS ------------ */
+var vendasQ = '';
 
 function pageVendas() {
-  const list = state.sales.filter(s => {
-    const v = vehicleById(s.vehicleId);
-    const q = vendasFilter.q.toLowerCase();
-    return !q || vehicleLabel(v).toLowerCase().includes(q) || (s.comprador||'').toLowerCase().includes(q);
-  }).sort((a, b) => (b.data||'').localeCompare(a.data||''));
+  var list = [];
+  for (var i = 0; i < state.sales.length; i++) {
+    var s = state.sales[i];
+    var v = vehicleById(s.vehicleId);
+    var q = vendasQ.toLowerCase();
+    if (!q || vehicleLabel(v).toLowerCase().indexOf(q) !== -1 || (s.comprador||'').toLowerCase().indexOf(q) !== -1) {
+      list.push(s);
+    }
+  }
+  list.sort(function(a,b){ return (b.data||'') > (a.data||'') ? 1 : -1; });
 
-  const total = list.reduce((s, x) => s + Number(x.valor || 0), 0);
+  var total = 0;
+  for (var t = 0; t < list.length; t++) total += Number(list[t].valor || 0);
 
-  return `
-  <div class="search-bar">
-    <div class="search-input-wrap">
-      <span class="search-icon">&#x1F50D;</span>
-      <input type="text" placeholder="Buscar por veículo ou comprador..." value="${vendasFilter.q}" oninput="vendasFilter.q=this.value;renderPage('vendas')">
-    </div>
-    <button class="btn btn-success" onclick="openVendaForm()">&#xFF0B; Registrar Venda</button>
-  </div>
-  <div class="card">
-    <div class="card-header">
-      <h2>Vendas (${list.length})</h2>
-      <span style="font-weight:600;color:var(--success)">${fmtBRL(total)}</span>
-    </div>
-    <div class="table-wrap">
-      ${list.length === 0 ? `<div class="empty-state"><div class="icon">&#x1F4B0;</div><p>${state.sales.length === 0 ? 'Nenhuma venda registrada. Clique em "Registrar Venda" para começar.' : 'Nenhuma venda encontrada.'}</p></div>` : `
-      <table>
-        <thead><tr><th>Data</th><th>Veículo</th><th>Comprador</th><th>Forma Pgto</th><th class="text-right">Custo</th><th class="text-right">Valor Venda</th><th class="text-right">Lucro</th><th></th></tr></thead>
-        <tbody>
-          ${list.map(s => {
-            const v = vehicleById(s.vehicleId);
-            const p = purchaseByVehicle(s.vehicleId);
-            const custo = Number(p?.valor || 0) + Number(p?.custoExtra || 0);
-            const lucro = Number(s.valor || 0) - custo;
-            return `<tr>
-              <td>${fmtDate(s.data)}</td>
-              <td><div style="font-weight:500">${vehicleLabel(v)}</div></td>
-              <td>
-                <div>${s.comprador || '—'}</div>
-                ${s.contato ? `<div class="text-muted">${s.contato}</div>` : ''}
-              </td>
-              <td>${s.formaPgto || '—'}</td>
-              <td class="text-right">${custo ? fmtBRL(custo) : '—'}</td>
-              <td class="text-right font-bold" style="color:var(--success)">${fmtBRL(s.valor)}</td>
-              <td class="text-right"><span class="${lucro >= 0 ? 'lucro-positive' : 'lucro-negative'}">${fmtBRL(lucro)}</span></td>
-              <td>
-                <div class="flex gap-2">
-                  <button class="btn btn-ghost btn-sm btn-icon" onclick="openVendaForm('${s.id}')">&#x270F;&#xFE0F;</button>
-                  <button class="btn btn-ghost btn-sm btn-icon" onclick="deleteVenda('${s.id}')">&#x1F5D1;</button>
-                </div>
-              </td>
-            </tr>`;
-          }).join('')}
-        </tbody>
-      </table>`}
-    </div>
-  </div>`;
+  var rows = '';
+  for (var j = 0; j < list.length; j++) {
+    var sv = list[j];
+    var vv = vehicleById(sv.vehicleId);
+    var pu = purchaseByVehicle(sv.vehicleId);
+    var custo = Number(pu ? pu.valor : 0) + Number(pu ? pu.custoExtra : 0);
+    var lucro = Number(sv.valor || 0) - custo;
+    rows += '<tr>' +
+      '<td>' + fmtDate(sv.data) + '</td>' +
+      '<td><div style="font-weight:500">' + vehicleLabel(vv) + '</div></td>' +
+      '<td><div>' + (sv.comprador || '-') + '</div>' + (sv.contato ? '<div class="mu">' + sv.contato + '</div>' : '') + '</td>' +
+      '<td>' + (sv.formaPgto || '-') + '</td>' +
+      '<td class="tr">' + (custo ? fmtBRL(custo) : '-') + '</td>' +
+      '<td class="tr fb" style="color:var(--success)">' + fmtBRL(sv.valor) + '</td>' +
+      '<td class="tr"><span class="' + (lucro >= 0 ? 'lp' : 'ln') + '">' + fmtBRL(lucro) + '</span></td>' +
+      '<td><div class="fl g2">' +
+      '<button class="btn bg2 bsm bic" onclick="openVendaForm(\'' + sv.id + \')">&#x270F;&#xFE0F;</button>' +
+      '<button class="btn bg2 bsm bic" onclick="deleteVenda(\'' + sv.id + \')">&#x1F5D1;</button>' +
+      '</div></td></tr>';
+  }
+
+  var tableHtml = list.length === 0
+    ? '<div class="es"><div class="ic">&#x1F4B0;</div><p>' + (state.sales.length === 0 ? 'Nenhuma venda registrada. Clique em "+ Registrar Venda" para comecar.' : 'Nenhuma venda encontrada.') + '</p></div>'
+    : '<table><thead><tr><th>Data</th><th>Veiculo</th><th>Comprador</th><th>Forma Pgto</th><th class="tr">Custo</th><th class="tr">Valor Venda</th><th class="tr">Lucro</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
+
+  return '<div class="sb-w">' +
+    '<div class="si-w"><span class="si-ic">&#x1F50D;</span><input type="text" placeholder="Buscar por veiculo ou comprador..." value="' + vendasQ + '" oninput="vendasQ=this.value;renderPage(\'vendas\')"></div>' +
+    '<button class="btn bs" onclick="openVendaForm(\'\')>+ Registrar Venda</button>' +
+    '</div>' +
+    '<div class="card"><div class="ch"><h2>Vendas (' + list.length + ')</h2><span style="font-weight:600;color:var(--success)">' + fmtBRL(total) + '</span></div>' +
+    '<div class="tw">' + tableHtml + '</div></div>';
 }
 
 function openVendaForm(id) {
-  const s = id ? state.sales.find(x => x.id === id) : null;
-  const vendidosIds = new Set(state.sales.map(x => x.vehicleId));
-  const opts = (id
-    ? state.vehicles
-    : state.vehicles.filter(v => !vendidosIds.has(v.id))
-  ).map(v => `<option value="${v.id}" ${s?.vehicleId === v.id ? 'selected' : ''}>${vehicleLabel(v)}</option>`).join('');
+  var s = null;
+  for (var i = 0; i < state.sales.length; i++) { if (state.sales[i].id === id) { s = state.sales[i]; break; } }
 
-  const html = `
-  <form id="venda-form" onsubmit="saveVenda(event,'${id||''}')">
-    <div class="form-grid">
-      <div class="field form-col-full">
-        <label>Veículo *</label>
-        <select name="vehicleId" required ${s ? 'disabled' : ''}>
-          <option value="">Selecione um veículo</option>
-          ${opts}
-        </select>
-        ${s ? `<input type="hidden" name="vehicleId" value="${s.vehicleId}">` : ''}
-      </div>
-      <div class="field">
-        <label>Data da Venda *</label>
-        <input type="date" name="data" value="${s?.data || todayISO()}" required>
-      </div>
-      <div class="field">
-        <label>Valor de Venda (R$) *</label>
-        <input type="number" name="valor" value="${s?.valor||''}" placeholder="0,00" min="0" step="0.01" required>
-      </div>
-      <div class="field">
-        <label>Nome do Comprador</label>
-        <input type="text" name="comprador" value="${s?.comprador||''}" placeholder="Nome completo">
-      </div>
-      <div class="field">
-        <label>Contato</label>
-        <input type="text" name="contato" value="${s?.contato||''}" placeholder="Telefone ou e-mail">
-      </div>
-      <div class="field">
-        <label>Forma de Pagamento</label>
-        <select name="formaPgto">
-          ${['','Dinheiro','PIX','Transferência','Cheque','Financiamento','Outro'].map(x => `<option ${(s?.formaPgto||'')=== x?'selected':''}>${x}</option>`).join('')}
-        </select>
-      </div>
-      <div class="field form-col-full">
-        <label>Observações</label>
-        <textarea name="obs" placeholder="Detalhes da negociação...">${s?.obs||''}</textarea>
-      </div>
-    </div>
-    <div class="form-actions">
-      <button type="button" class="btn btn-ghost" onclick="Modal.close()">Cancelar</button>
-      <button type="submit" class="btn btn-success">&#x1F4BE; Salvar</button>
-    </div>
-  </form>`;
-  Modal.open(s ? 'Editar Venda' : 'Registrar Venda', html);
+  var soldIds = {};
+  for (var k = 0; k < state.sales.length; k++) soldIds[state.sales[k].vehicleId] = true;
+
+  var vOpts = '';
+  var vehs = id ? state.vehicles : state.vehicles.filter(function(v) { return !soldIds[v.id]; });
+  for (var j = 0; j < vehs.length; j++) {
+    var vv = vehs[j];
+    vOpts += '<option value="' + vv.id + '"' + (s && vv.id === s.vehicleId ? ' selected' : '') + '>' + vehicleLabel(vv) + '</option>';
+  }
+
+  var pgtos = ['','Dinheiro','PIX','Transferencia','Cheque','Financiamento','Outro'];
+  var pgtoOpts = '';
+  for (var gi = 0; gi < pgtos.length; gi++) { pgtoOpts += '<option' + (prop(s,'formaPgto') === pgtos[gi] ? ' selected' : '') + '>' + pgtos[gi] + '</option>'; }
+
+  var html =
+    '<form id="vdf" onsubmit="saveVenda(event)">' +
+    '<input type="hidden" name="sid" value="' + (id || '') + '">' +
+    '<div class="fg">' +
+    '<div class="fd ffc"><label>Veiculo *</label>' +
+    '<select name="vehicleId" required' + (s ? ' disabled' : '') + '>' +
+    '<option value="">Selecione um veiculo</option>' + vOpts + '</select>' +
+    (s ? '<input type="hidden" name="vehicleId" value="' + s.vehicleId + '">' : '') +
+    '</div>' +
+    '<div class="fd"><label>Data da Venda *</label><input type="date" name="data" value="' + prop(s,'data',todayISO()) + '" required></div>' +
+    '<div class="fd"><label>Valor de Venda (R$) *</label><input type="number" name="valor" value="' + prop(s,'valor') + '" placeholder="0.00" min="0" step="0.01" required></div>' +
+    '<div class="fd"><label>Nome do Comprador</label><input type="text" name="comprador" value="' + prop(s,'comprador') + '" placeholder="Nome completo"></div>' +
+    '<div class="fd"><label>Contato</label><input type="text" name="contato" value="' + prop(s,'contato') + '" placeholder="Telefone ou e-mail"></div>' +
+    '<div class="fd"><label>Forma de Pagamento</label><select name="formaPgto">' + pgtoOpts + '</select></div>' +
+    '<div class="fd ffc"><label>Observacoes</label><textarea name="obs">' + prop(s,'obs') + '</textarea></div>' +
+    '</div>' +
+    '<div class="fa"><button type="button" class="btn bg2" onclick="closeModal()">Cancelar</button><button type="submit" class="btn bs">&#x1F4BE; Salvar</button></div>' +
+    '</form>';
+  openModal(s ? 'Editar Venda' : 'Registrar Venda', html);
 }
 
-function saveVenda(e, id) {
+function saveVenda(e) {
   e.preventDefault();
-  const fd = new FormData(e.target);
-  const data = Object.fromEntries(fd.entries());
-  if (!data.vehicleId) { Toast.show('Selecione um veículo.', 'error'); return; }
+  var d = formToObj(e.target);
+  var id = d.sid;
+  delete d.sid;
+  if (!d.vehicleId) { showToast('Selecione um veiculo.', 'error'); return; }
   if (id) {
-    const idx = state.sales.findIndex(x => x.id === id);
-    state.sales[idx] = { ...state.sales[idx], ...data };
+    for (var i = 0; i < state.sales.length; i++) {
+      if (state.sales[i].id === id) { state.sales[i] = Object.assign({}, state.sales[i], d); break; }
+    }
+    showToast('Venda atualizada!');
   } else {
-    if (saleByVehicle(data.vehicleId)) { Toast.show('Este veículo já foi vendido.', 'error'); return; }
-    state.sales.push({ id: genId(), ...data });
-    const vidx = state.vehicles.findIndex(v => v.id === data.vehicleId);
-    if (vidx !== -1) state.vehicles[vidx].status = 'vendido';
+    if (saleByVehicle(d.vehicleId)) { showToast('Este veiculo ja foi vendido.', 'error'); return; }
+    d.id = genId();
+    state.sales.push(d);
+    for (var j = 0; j < state.vehicles.length; j++) {
+      if (state.vehicles[j].id === d.vehicleId) { state.vehicles[j].status = 'vendido'; break; }
+    }
+    showToast('Venda registrada!');
   }
-  saveState(); Toast.show('Venda registrada!'); Modal.close(); renderPage('vendas');
+  saveState(); closeModal(); renderPage('vendas');
 }
 
-async function deleteVenda(id) {
-  const s = state.sales.find(x => x.id === id);
-  const ok = await Confirm.show('Excluir este registro de venda? O veículo voltará ao estoque como Disponível.');
-  if (!ok) return;
-  if (s) {
-    const vidx = state.vehicles.findIndex(v => v.id === s.vehicleId);
-    if (vidx !== -1 && state.vehicles[vidx].status === 'vendido') state.vehicles[vidx].status = 'disponivel';
-  }
-  state.sales = state.sales.filter(x => x.id !== id);
-  saveState(); Toast.show('Venda excluída.', 'error'); renderPage('vendas');
-}
-
-function pageRelatorios() {
-  const rows = state.vehicles.map(v => {
-    const p = purchaseByVehicle(v.id);
-    const s = saleByVehicle(v.id);
-    const custo = Number(p?.valor || 0) + Number(p?.custoExtra || 0);
-    const venda = Number(s?.valor || 0);
-    const lucro = s ? venda - custo : null;
-    const margem = custo && lucro !== null ? (lucro / custo * 100) : null;
-    return { v, p, s, custo, venda, lucro, margem };
+function deleteVenda(id) {
+  var s = null;
+  for (var i = 0; i < state.sales.length; i++) { if (state.sales[i].id === id) { s = state.sales[i]; break; } }
+  showConfirm('Excluir este registro de venda? O veiculo voltara ao estoque como Disponivel.').then(function(ok) {
+    if (!ok) return;
+    if (s) {
+      for (var j = 0; j < state.vehicles.length; j++) {
+        if (state.vehicles[j].id === s.vehicleId && state.vehicles[j].status === 'vendido') {
+          state.vehicles[j].status = 'disponivel'; break;
+        }
+      }
+    }
+    state.sales = state.sales.filter(function(x) { return x.id !== id; });
+    saveState(); showToast('Venda excluida.', 'error'); renderPage('vendas');
   });
-
-  const vendidos = rows.filter(r => r.s);
-  const totalCusto = vendidos.reduce((a, r) => a + r.custo, 0);
-  const totalVenda = vendidos.reduce((a, r) => a + r.venda, 0);
-  const totalLucro = totalVenda - totalCusto;
-  const margemMedia = vendidos.length && totalCusto ? (totalLucro / totalCusto * 100) : 0;
-  const investimentoEmEstoque = rows.filter(r => !r.s && r.p).reduce((a, r) => a + r.custo, 0);
-  const maxLucro = Math.max(...vendidos.map(r => Math.abs(r.lucro || 0)), 1);
-
-  const pgtoMap = {};
-  state.sales.forEach(s => { const k = s.formaPgto || 'Não inf.'; pgtoMap[k] = (pgtoMap[k] || 0) + 1; });
-  const pgtoEntries = Object.entries(pgtoMap).sort((a, b) => b[1] - a[1]);
-
-  return `
-  <div class="kpi-grid">
-    <div class="kpi-card">
-      <div class="kpi-icon" style="background:#fee2e2">&#x1F4B8;</div>
-      <div>
-        <div class="label">Total Comprado</div>
-        <div class="value" style="font-size:1.05rem">${fmtBRL(totalCusto)}</div>
-        <div class="sub">${vendidos.length} veículo(s) vendido(s)</div>
-      </div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-icon" style="background:#dcfce7">&#x1F4B5;</div>
-      <div>
-        <div class="label">Total Recebido</div>
-        <div class="value" style="font-size:1.05rem">${fmtBRL(totalVenda)}</div>
-        <div class="sub">em ${vendidos.length} venda(s)</div>
-      </div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-icon" style="background:${totalLucro >= 0 ? '#dcfce7' : '#fee2e2'}">&#x1F4C8;</div>
-      <div>
-        <div class="label">Lucro Líquido</div>
-        <div class="value ${totalLucro >= 0 ? 'lucro-positive' : 'lucro-negative'}" style="font-size:1.05rem">${fmtBRL(totalLucro)}</div>
-        <div class="sub">Margem: ${margemMedia.toFixed(1)}%</div>
-      </div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-icon" style="background:#dbeafe">&#x1F4CA;</div>
-      <div>
-        <div class="label">Capital em Estoque</div>
-        <div class="value" style="font-size:1.05rem">${fmtBRL(investimentoEmEstoque)}</div>
-        <div class="sub">${rows.filter(r => !r.s).length} veículo(s) disponível</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="dash-grid">
-    <div class="card">
-      <div class="card-header"><h2>Lucratividade por Veículo</h2></div>
-      <div class="table-wrap">
-        ${vendidos.length === 0 ? '<div class="empty-state" style="padding:30px"><p>Nenhuma venda registrada ainda.</p></div>' : `
-        <table class="report-table">
-          <thead><tr><th>Veículo</th><th class="text-right">Custo</th><th class="text-right">Venda</th><th class="text-right">Lucro</th><th>Margem</th></tr></thead>
-          <tbody>
-            ${vendidos.sort((a,b) => (b.lucro||0) - (a.lucro||0)).map(r => `
-            <tr>
-              <td>${vehicleLabel(r.v)}</td>
-              <td class="text-right">${fmtBRL(r.custo)}</td>
-              <td class="text-right">${fmtBRL(r.venda)}</td>
-              <td class="text-right"><span class="${(r.lucro||0) >= 0 ? 'lucro-positive' : 'lucro-negative'}">${fmtBRL(r.lucro)}</span></td>
-              <td>
-                <div class="profit-bar-wrap">
-                  <div class="profit-bar ${(r.lucro||0) < 0 ? 'neg' : ''}" style="width:${Math.round(Math.abs(r.lucro||0)/maxLucro*100)}px"></div>
-                  <span class="${(r.lucro||0) >= 0 ? 'lucro-positive' : 'lucro-negative'}" style="font-size:.78rem">${r.margem !== null ? r.margem.toFixed(1)+'%' : '—'}</span>
-                </div>
-              </td>
-            </tr>`).join('')}
-          </tbody>
-        </table>`}
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-header"><h2>Formas de Pagamento (Vendas)</h2></div>
-      <div class="card-body">
-        ${pgtoEntries.length === 0 ? '<p class="text-muted" style="text-align:center;padding:20px 0">Sem dados ainda.</p>' : `
-        <table>
-          <thead><tr><th>Forma</th><th class="text-right">Qtd</th><th class="text-right">%</th></tr></thead>
-          <tbody>
-            ${pgtoEntries.map(([k, n]) => `
-            <tr>
-              <td>${k || 'Não informado'}</td>
-              <td class="text-right">${n}</td>
-              <td class="text-right">${state.sales.length ? ((n/state.sales.length)*100).toFixed(0)+'%' : '—'}</td>
-            </tr>`).join('')}
-          </tbody>
-        </table>`}
-      </div>
-    </div>
-  </div>
-
-  <div class="card mt-4">
-    <div class="card-header"><h2>Todos os Veículos — Análise Completa</h2></div>
-    <div class="table-wrap">
-      ${rows.length === 0 ? '<div class="empty-state" style="padding:30px"><div class="icon">&#x1F697;</div><p>Nenhum veículo cadastrado.</p></div>' : `
-      <table class="report-table">
-        <thead><tr><th>Veículo</th><th>Status</th><th>Compra</th><th class="text-right">Custo Total</th><th>Venda</th><th class="text-right">Valor Venda</th><th class="text-right">Lucro</th></tr></thead>
-        <tbody>
-          ${rows.map(r => `
-          <tr>
-            <td>${vehicleLabel(r.v)}</td>
-            <td>${statusBadge(r.v.status)}</td>
-            <td>${r.p ? fmtDate(r.p.data) : '—'}</td>
-            <td class="text-right">${r.custo ? fmtBRL(r.custo) : '—'}</td>
-            <td>${r.s ? fmtDate(r.s.data) : '—'}</td>
-            <td class="text-right">${r.venda ? fmtBRL(r.venda) : '—'}</td>
-            <td class="text-right">${r.lucro !== null ? `<span class="${r.lucro >= 0 ? 'lucro-positive' : 'lucro-negative'}">${fmtBRL(r.lucro)}</span>` : '—'}</td>
-          </tr>`).join('')}
-          <tr style="background:var(--gray-50);font-weight:700">
-            <td colspan="3">TOTAL (vendidos)</td>
-            <td class="text-right">${fmtBRL(totalCusto)}</td>
-            <td></td>
-            <td class="text-right">${fmtBRL(totalVenda)}</td>
-            <td class="text-right"><span class="${totalLucro >= 0 ? 'lucro-positive' : 'lucro-negative'}">${fmtBRL(totalLucro)}</span></td>
-          </tr>
-        </tbody>
-      </table>`}
-    </div>
-  </div>`;
 }
 
-function init() {
-  document.getElementById('topbar-date').textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
-  renderPage('dashboard');
+/* ------------ RELATORIOS ------------ */
+function pageRelatorios() {
+  var rows = [];
+  for (var i = 0; i < state.vehicles.length; i++) {
+    var v = state.vehicles[i];
+    var p = purchaseByVehicle(v.id);
+    var s = saleByVehicle(v.id);
+    var custo = Number(p ? p.valor : 0) + Number(p ? p.custoExtra : 0);
+    var venda = Number(s ? s.valor : 0);
+    var lucro = s ? venda - custo : null;
+    var margem = (custo && lucro !== null) ? (lucro / custo * 100) : null;
+    rows.push({ v: v, p: p, s: s, custo: custo, venda: venda, lucro: lucro, margem: margem });
+  }
+
+  var vendidos = rows.filter(function(r) { return r.s; });
+  var totalCusto = 0, totalVenda = 0;
+  for (var j = 0; j < vendidos.length; j++) { totalCusto += vendidos[j].custo; totalVenda += vendidos[j].venda; }
+  var totalLucro = totalVenda - totalCusto;
+  var margemMedia = vendidos.length && totalCusto ? (totalLucro / totalCusto * 100) : 0;
+  var emEstoque = rows.filter(function(r) { return !r.s && r.p; });
+  var invEstoque = 0;
+  for (var e = 0; e < emEstoque.length; e++) invEstoque += emEstoque[e].custo;
+
+  var maxLucro = 1;
+  for (var ml = 0; ml < vendidos.length; ml++) { if (Math.abs(vendidos[ml].lucro || 0) > maxLucro) maxLucro = Math.abs(vendidos[ml].lucro || 0); }
+
+  var pgtoMap = {};
+  for (var ps = 0; ps < state.sales.length; ps++) {
+    var k = state.sales[ps].formaPgto || 'Nao inf.';
+    pgtoMap[k] = (pgtoMap[k] || 0) + 1;
+  }
+  var pgtoEntries = [];
+  for (var pk in pgtoMap) { pgtoEntries.push([pk, pgtoMap[pk]]); }
+  pgtoEntries.sort(function(a,b){ return b[1]-a[1]; });
+
+  var lucroClass = totalLucro >= 0 ? 'lp' : 'ln';
+
+  var lucroRows = '';
+  if (vendidos.length === 0) {
+    lucroRows = '<div class="es" style="padding:30px"><p>Nenhuma venda registrada ainda.</p></div>';
+  } else {
+    vendidos.sort(function(a,b){ return (b.lucro||0)-(a.lucro||0); });
+    lucroRows = '<table class="pbt"><thead><tr><th>Veiculo</th><th class="tr">Custo</th><th class="tr">Venda</th><th class="tr">Lucro</th><th>Margem</th></tr></thead><tbody>';
+    for (var li = 0; li < vendidos.length; li++) {
+      var r = vendidos[li];
+      var lc = (r.lucro||0) >= 0 ? 'lp' : 'ln';
+      var bw = Math.round(Math.abs(r.lucro||0)/maxLucro*100);
+      var bc = (r.lucro||0) < 0 ? ' ng' : '';
+      lucroRows += '<tr><td>' + vehicleLabel(r.v) + '</td>' +
+        '<td class="tr">' + fmtBRL(r.custo) + '</td>' +
+        '<td class="tr">' + fmtBRL(r.venda) + '</td>' +
+        '<td class="tr"><span class="' + lc + '">' + fmtBRL(r.lucro) + '</span></td>' +
+        '<td><div class="pbw"><div class="pb' + bc + '" style="width:' + bw + 'px"></div>' +
+        '<span class="' + lc + '" style="font-size:.78rem">' + (r.margem !== null ? r.margem.toFixed(1)+'%' : '-') + '</span></div></td></tr>';
+    }
+    lucroRows += '</tbody></table>';
+  }
+
+  var pgtoHtml = '';
+  if (pgtoEntries.length === 0) {
+    pgtoHtml = '<p class="mu" style="text-align:center;padding:20px 0">Sem dados ainda.</p>';
+  } else {
+    pgtoHtml = '<table><thead><tr><th>Forma</th><th class="tr">Qtd</th><th class="tr">%</th></tr></thead><tbody>';
+    for (var pi2 = 0; pi2 < pgtoEntries.length; pi2++) {
+      var pct = state.sales.length ? ((pgtoEntries[pi2][1]/state.sales.length)*100).toFixed(0)+'%' : '-';
+      pgtoHtml += '<tr><td>' + pgtoEntries[pi2][0] + '</td><td class="tr">' + pgtoEntries[pi2][1] + '</td><td class="tr">' + pct + '</td></tr>';
+    }
+    pgtoHtml += '</tbody></table>';
+  }
+
+  var allRows = '';
+  if (rows.length === 0) {
+    allRows = '<div class="es" style="padding:30px"><div class="ic">&#x1F697;</div><p>Nenhum veiculo cadastrado.</p></div>';
+  } else {
+    allRows = '<table class="pbt"><thead><tr><th>Veiculo</th><th>Status</th><th>Compra</th><th class="tr">Custo</th><th>Venda</th><th class="tr">Valor</th><th class="tr">Lucro</th></tr></thead><tbody>';
+    for (var ri = 0; ri < rows.length; ri++) {
+      var row = rows[ri];
+      var rlc = row.lucro !== null ? (row.lucro >= 0 ? 'lp' : 'ln') : '';
+      var rls = row.lucro !== null ? '<span class="' + rlc + '">' + fmtBRL(row.lucro) + '</span>' : '-';
+      allRows += '<tr><td>' + vehicleLabel(row.v) + '</td><td>' + statusBadge(row.v.status) + '</td>' +
+        '<td>' + (row.p ? fmtDate(row.p.data) : '-') + '</td><td class="tr">' + (row.custo ? fmtBRL(row.custo) : '-') + '</td>' +
+        '<td>' + (row.s ? fmtDate(row.s.data) : '-') + '</td><td class="tr">' + (row.venda ? fmtBRL(row.venda) : '-') + '</td>' +
+        '<td class="tr">' + rls + '</td></tr>';
+    }
+    allRows += '<tr style="background:var(--g50);font-weight:700"><td colspan="3">TOTAL (vendidos)</td>' +
+      '<td class="tr">' + fmtBRL(totalCusto) + '</td><td></td><td class="tr">' + fmtBRL(totalVenda) + '</td>' +
+      '<td class="tr"><span class="' + lucroClass + '">' + fmtBRL(totalLucro) + '</span></td></tr>';
+    allRows += '</tbody></table>';
+  }
+
+  return '<div class="kgrid">' +
+    '<div class="kc"><div class="ki" style="background:#fee2e2">&#x1F4B8;</div><div><div class="lb">Total Comprado</div><div class="vl" style="font-size:1.05rem">' + fmtBRL(totalCusto) + '</div><div class="sb">' + vendidos.length + ' veiculo(s) vendido(s)</div></div></div>' +
+    '<div class="kc"><div class="ki" style="background:#dcfce7">&#x1F4B5;</div><div><div class="lb">Total Recebido</div><div class="vl" style="font-size:1.05rem">' + fmtBRL(totalVenda) + '</div><div class="sb">em ' + vendidos.length + ' venda(s)</div></div></div>' +
+    '<div class="kc"><div class="ki" style="background:' + (totalLucro >= 0 ? '#dcfce7' : '#fee2e2') + '">&#x1F4C8;</div><div><div class="lb">Lucro Liquido</div><div class="vl ' + lucroClass + '" style="font-size:1.05rem">' + fmtBRL(totalLucro) + '</div><div class="sb">Margem: ' + margemMedia.toFixed(1) + '%</div></div></div>' +
+    '<div class="kc"><div class="ki" style="background:#dbeafe">&#x1F4CA;</div><div><div class="lb">Capital em Estoque</div><div class="vl" style="font-size:1.05rem">' + fmtBRL(invEstoque) + '</div><div class="sb">' + emEstoque.length + ' veiculo(s)</div></div></div>' +
+    '</div>' +
+    '<div class="dg">' +
+    '<div class="card"><div class="ch"><h2>Lucratividade por Veiculo</h2></div><div class="tw">' + lucroRows + '</div></div>' +
+    '<div class="card"><div class="ch"><h2>Formas de Pagamento</h2></div><div class="cb">' + pgtoHtml + '</div></div>' +
+    '</div>' +
+    '<div class="card mt4"><div class="ch"><h2>Todos os Veiculos - Analise Completa</h2></div><div class="tw">' + allRows + '</div></div>';
 }
 
-init();
+/* -- Init -- */
+g('tb-date').textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+renderPage('dashboard');
 </script>
 </body>
 </html>
