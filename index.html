@@ -11,6 +11,7 @@
       --success: #16a34a; --success-light: #dcfce7;
       --danger: #dc2626;  --danger-light: #fee2e2;
       --warning: #d97706; --warning-light: #fef3c7;
+      --orange: #ea580c;  --orange-light: #ffedd5;
       --g50:#f8fafc; --g100:#f1f5f9; --g200:#e2e8f0; --g300:#cbd5e1;
       --g400:#94a3b8; --g500:#64748b; --g600:#475569; --g700:#334155;
       --g800:#1e293b; --g900:#0f172a;
@@ -60,6 +61,7 @@
     .by{background:var(--warning-light);color:var(--warning)}
     .bb{background:var(--primary-light);color:var(--primary)}
     .bgr{background:var(--g100);color:var(--g600)}
+    .bo{background:var(--orange-light);color:var(--orange)}
     .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:7px;font-size:.85rem;font-weight:500;cursor:pointer;border:none;transition:filter .15s,transform .1s;white-space:nowrap}
     .btn:active{transform:scale(.98)}
     .bp{background:var(--primary);color:#fff}
@@ -132,6 +134,25 @@
     .ts{padding:12px 18px;border-radius:8px;color:#fff;font-size:.87rem;box-shadow:var(--shm);animation:si2 .2s ease;max-width:300px}
     .ts-s{background:var(--success)}.ts-e{background:var(--danger)}.ts-i{background:var(--primary)}
     @keyframes si2{from{transform:translateX(60px);opacity:0}to{transform:translateX(0);opacity:1}}
+    /* parcela rows */
+    .parc-block{border:1px solid var(--g200);border-radius:var(--r);margin-bottom:12px;overflow:hidden}
+    .parc-hdr{padding:12px 16px;background:var(--g50);display:flex;align-items:center;justify-content:space-between;cursor:pointer;gap:8px}
+    .parc-hdr:hover{background:var(--g100)}
+    .parc-body{display:none;padding:0}
+    .parc-body.open{display:block}
+    .parc-row{display:flex;align-items:center;padding:8px 16px;border-top:1px solid var(--g100);gap:10px;font-size:.83rem}
+    .parc-row:hover{background:var(--g50)}
+    .parc-num{width:36px;font-weight:600;color:var(--g500);flex-shrink:0}
+    .parc-date{width:90px;flex-shrink:0}
+    .parc-val{width:100px;text-align:right;font-weight:600;flex-shrink:0}
+    .parc-sta{flex:1}
+    .parc-btn{flex-shrink:0}
+    .alert-bar{background:var(--danger-light);border:1px solid #fca5a5;border-radius:var(--r);padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;font-size:.88rem;color:var(--danger)}
+    .alert-bar.warn{background:var(--warning-light);border-color:#fcd34d;color:var(--warning)}
+    .prog-bar-bg{height:6px;background:var(--g200);border-radius:3px;flex:1}
+    .prog-bar{height:6px;background:var(--success);border-radius:3px}
+    .prog-bar.partial{background:var(--warning)}
+    .prog-bar.zero{background:var(--g300)}
   </style>
 </head>
 <body>
@@ -139,7 +160,7 @@
   <nav id="sidebar">
     <div class="sl">
       <div class="t">&#x1F697; AutoGestao</div>
-      <div class="s">Compra &amp; Venda de Veiculos</div>
+      <div class="s">Compra &amp; Venda</div>
     </div>
     <div class="sn">
       <div class="lbl">Menu</div>
@@ -147,7 +168,8 @@
       <div class="ni" data-page="estoque"><span class="ic">&#x1F697;</span><span>Estoque</span></div>
       <div class="ni" data-page="compras"><span class="ic">&#x1F6D2;</span><span>Compras</span></div>
       <div class="ni" data-page="vendas"><span class="ic">&#x1F4B0;</span><span>Vendas</span></div>
-      <div class="lbl">Analise</div>
+      <div class="lbl">Financeiro</div>
+      <div class="ni" data-page="parcelamentos"><span class="ic">&#x1F4C5;</span><span>Parcelamentos</span></div>
       <div class="ni" data-page="relatorios"><span class="ic">&#x1F4C8;</span><span>Relatorios</span></div>
     </div>
   </nav>
@@ -162,25 +184,19 @@
 
 <div class="mo hidden" id="mo">
   <div class="md">
-    <div class="mh">
-      <h3 id="m-title">-</h3>
-      <button class="mc" id="m-close">&#x2715;</button>
-    </div>
+    <div class="mh"><h3 id="m-title">-</h3><button class="mc" id="m-close">&#x2715;</button></div>
     <div class="mb" id="m-body"></div>
   </div>
 </div>
 
 <div class="mo hidden cm" id="co">
   <div class="md">
-    <div class="mh">
-      <h3 id="c-title">Confirmar</h3>
-      <button class="mc" id="c-close">&#x2715;</button>
-    </div>
+    <div class="mh"><h3 id="c-title">Confirmar</h3><button class="mc" id="c-close">&#x2715;</button></div>
     <div class="cfb">
       <p id="c-msg"></p>
       <div class="cfa">
         <button class="btn bg2" id="c-cancel">Cancelar</button>
-        <button class="btn bd" id="c-ok">Excluir</button>
+        <button class="btn bd" id="c-ok">Confirmar</button>
       </div>
     </div>
   </div>
@@ -188,745 +204,872 @@
 
 <div id="tc"></div>
 
+<script type="application/json" id="seed-data">
+{"vehicles": [{"id": "v001", "marca": "PEUGEOT", "modelo": "207", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v002", "marca": "SANDERO", "modelo": "", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v003", "marca": "PEUGEOT", "modelo": "307", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v004", "marca": "MONDEO", "modelo": "", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v005", "marca": "FUSION", "modelo": "", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v006", "marca": "ECOSPORT", "modelo": "", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v007", "marca": "COROLLA", "modelo": "CINZA", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v008", "marca": "UNO", "modelo": "", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v009", "marca": "FOCUS", "modelo": "", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v010", "marca": "FIT", "modelo": "", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v011", "marca": "KA", "modelo": "SEDAN", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v012", "marca": "PCX", "modelo": "", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v013", "marca": "CG", "modelo": "160", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v014", "marca": "FIESTA", "modelo": "PAULA", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v015", "marca": "CG", "modelo": "150", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v016", "marca": "SWIFT", "modelo": "EDMAR", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v017", "marca": "ASTRA", "modelo": "", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v018", "marca": "ZAFIRA", "modelo": "", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v019", "marca": "FIESTA", "modelo": "PRETO", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v020", "marca": "Corolla", "modelo": "PRATA", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v021", "marca": "Corolla", "modelo": "verde", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v022", "marca": "GOL", "modelo": "", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v023", "marca": "TUCSON", "modelo": "", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v024", "marca": "BIZ", "modelo": "", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v025", "marca": "CG", "modelo": "AZUL", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v026", "marca": "CG", "modelo": "125 FAN", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v027", "marca": "HILUX", "modelo": "", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v028", "marca": "HRV", "modelo": "", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v029", "marca": "FIT", "modelo": "", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v030", "marca": "PRISMA", "modelo": "", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v031", "marca": "AGILE", "modelo": "", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v032", "marca": "STRADA", "modelo": "V", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v033", "marca": "PALIO", "modelo": "BRANCO", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v034", "marca": "SPORTAGE", "modelo": "", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v035", "marca": "ASX", "modelo": "", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v036", "marca": "COMPAS", "modelo": "", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v037", "marca": "TORO", "modelo": "", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}, {"id": "v038", "marca": "2008", "modelo": "Peugeot", "ano": "", "placa": "", "cor": "", "combustivel": "Flex", "km": "", "chassi": "", "status": "vendido", "obs": ""}], "purchases": [{"id": "p001", "vehicleId": "v001", "data": "", "valor": 18312.96, "procedencia": "LEILÃO", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p002", "vehicleId": "v002", "data": "", "valor": 19874.07, "procedencia": "CARRO", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p003", "vehicleId": "v003", "data": "", "valor": 15081.0, "procedencia": "LEILÃO", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p004", "vehicleId": "v004", "data": "", "valor": 13430.0, "procedencia": "COMPRA", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p005", "vehicleId": "v005", "data": "", "valor": 32000.0, "procedencia": "", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p006", "vehicleId": "v006", "data": "", "valor": 37000.0, "procedencia": "", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p007", "vehicleId": "v007", "data": "", "valor": 23659.0, "procedencia": "", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p008", "vehicleId": "v008", "data": "", "valor": 16773.0, "procedencia": "", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p009", "vehicleId": "v009", "data": "", "valor": 20470.0, "procedencia": "COMPRA", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p010", "vehicleId": "v010", "data": "", "valor": 50329.93, "procedencia": "", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p011", "vehicleId": "v011", "data": "", "valor": 40050.0, "procedencia": "", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p012", "vehicleId": "v012", "data": "", "valor": 19600.0, "procedencia": "", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p013", "vehicleId": "v013", "data": "", "valor": 20500.0, "procedencia": "", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p014", "vehicleId": "v014", "data": "", "valor": 31500.0, "procedencia": "", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p015", "vehicleId": "v015", "data": "", "valor": 8644.0, "procedencia": "", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p016", "vehicleId": "v016", "data": "", "valor": 55000.0, "procedencia": "", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p017", "vehicleId": "v017", "data": "", "valor": 24000.0, "procedencia": "", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p018", "vehicleId": "v018", "data": "", "valor": 21249.0, "procedencia": "", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p019", "vehicleId": "v019", "data": "", "valor": 22130.0, "procedencia": "", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p020", "vehicleId": "v020", "data": "", "valor": 35900.0, "procedencia": "", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p021", "vehicleId": "v021", "data": "", "valor": 23658.0, "procedencia": "", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p022", "vehicleId": "v022", "data": "", "valor": 21495.0, "procedencia": "LANCE", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p023", "vehicleId": "v023", "data": "", "valor": 48800.0, "procedencia": "", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p024", "vehicleId": "v024", "data": "", "valor": 11264.0, "procedencia": "", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p025", "vehicleId": "v025", "data": "", "valor": 15963.0, "procedencia": "", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p026", "vehicleId": "v026", "data": "", "valor": 9000.0, "procedencia": "", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p027", "vehicleId": "v027", "data": "", "valor": 67500.0, "procedencia": "", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p028", "vehicleId": "v028", "data": "", "valor": 78000.0, "procedencia": "", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p029", "vehicleId": "v029", "data": "", "valor": 32000.0, "procedencia": "40000", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p030", "vehicleId": "v030", "data": "", "valor": 39000.0, "procedencia": "42500", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p031", "vehicleId": "v031", "data": "", "valor": 32000.0, "procedencia": "33700", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p032", "vehicleId": "v032", "data": "", "valor": 77954.51, "procedencia": "dívida", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p033", "vehicleId": "v033", "data": "", "valor": 35120.0, "procedencia": "37800", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p034", "vehicleId": "v034", "data": "", "valor": 113418.41, "procedencia": "112500", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p035", "vehicleId": "v035", "data": "", "valor": 60500.0, "procedencia": "61000", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p036", "vehicleId": "v036", "data": "", "valor": 108652.0, "procedencia": "121077", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p037", "vehicleId": "v037", "data": "", "valor": 82152.0, "procedencia": "94500", "formaPgto": "", "custoExtra": 0, "obs": ""}, {"id": "p038", "vehicleId": "v038", "data": "", "valor": 48400.0, "procedencia": "55700", "formaPgto": "", "custoExtra": 0, "obs": ""}], "sales": [{"id": "s001", "vehicleId": "v001", "data": "", "valor": 21000.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s002", "vehicleId": "v002", "data": "", "valor": 19000.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s003", "vehicleId": "v003", "data": "", "valor": 19000.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s004", "vehicleId": "v004", "data": "", "valor": 16000.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s005", "vehicleId": "v005", "data": "", "valor": 35000.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s006", "vehicleId": "v006", "data": "", "valor": 35500.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s007", "vehicleId": "v007", "data": "", "valor": 25000.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s008", "vehicleId": "v008", "data": "", "valor": 15500.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s009", "vehicleId": "v009", "data": "", "valor": 24000.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s010", "vehicleId": "v010", "data": "", "valor": 52000.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s011", "vehicleId": "v011", "data": "", "valor": 40000.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s012", "vehicleId": "v012", "data": "", "valor": 19600.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s013", "vehicleId": "v013", "data": "", "valor": 20500.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s014", "vehicleId": "v014", "data": "", "valor": 32000.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s015", "vehicleId": "v015", "data": "", "valor": 8644.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s016", "vehicleId": "v016", "data": "", "valor": 56500.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s017", "vehicleId": "v017", "data": "", "valor": 30000.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s018", "vehicleId": "v018", "data": "", "valor": 18500.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s019", "vehicleId": "v019", "data": "", "valor": 24600.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s020", "vehicleId": "v020", "data": "", "valor": 30900.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s021", "vehicleId": "v021", "data": "", "valor": 24000.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s022", "vehicleId": "v022", "data": "", "valor": 23000.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s023", "vehicleId": "v023", "data": "", "valor": 48600.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s024", "vehicleId": "v024", "data": "", "valor": 11800.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s025", "vehicleId": "v025", "data": "", "valor": 15900.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s026", "vehicleId": "v026", "data": "", "valor": 12000.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s027", "vehicleId": "v027", "data": "", "valor": 70000.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s028", "vehicleId": "v028", "data": "", "valor": 83500.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s029", "vehicleId": "v029", "data": "", "valor": 35800.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s030", "vehicleId": "v030", "data": "", "valor": 43000.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s031", "vehicleId": "v031", "data": "", "valor": 32000.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s032", "vehicleId": "v032", "data": "", "valor": 78000.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s033", "vehicleId": "v033", "data": "", "valor": 35120.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s034", "vehicleId": "v034", "data": "", "valor": 114000.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s035", "vehicleId": "v035", "data": "", "valor": 61000.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s036", "vehicleId": "v036", "data": "", "valor": 108652.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s037", "vehicleId": "v037", "data": "", "valor": 94500.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}, {"id": "s038", "vehicleId": "v038", "data": "", "valor": 51000.0, "comprador": "", "contato": "", "formaPgto": "", "obs": ""}], "parcelamentos": [{"id": "parc01", "comprador": "Paula", "veiculo": "FIESTA PAULA", "parcelas": [{"num": "1º", "vencimento": "2025-06-25", "valor": 1200.0, "pago": true}, {"num": "2º", "vencimento": "2025-07-25", "valor": 1200.0, "pago": true}, {"num": "3º", "vencimento": "2025-08-25", "valor": 1200.0, "pago": true}, {"num": "4º", "vencimento": "2025-09-25", "valor": 1200.0, "pago": true}, {"num": "5º", "vencimento": "2025-10-25", "valor": 1200.0, "pago": true}, {"num": "6º", "vencimento": "2025-11-25", "valor": 1200.0, "pago": true}, {"num": "7º", "vencimento": "2025-12-25", "valor": 1200.0, "pago": true}, {"num": "8º", "vencimento": "2026-01-25", "valor": 1200.0, "pago": true}, {"num": "9º", "vencimento": "2026-02-25", "valor": 1200.0, "pago": true}, {"num": "10º", "vencimento": "2026-03-25", "valor": 1200.0, "pago": true}]}, {"id": "parc02", "comprador": "Cleiton", "veiculo": "", "parcelas": [{"num": "1º", "vencimento": "2025-07-10", "valor": 1000.0, "pago": true}, {"num": "2º", "vencimento": "2025-08-10", "valor": 1000.0, "pago": true}, {"num": "3º", "vencimento": "2025-09-10", "valor": 1000.0, "pago": true}, {"num": "4º", "vencimento": "2025-10-10", "valor": 1000.0, "pago": true}, {"num": "5º", "vencimento": "2025-11-10", "valor": 1000.0, "pago": true}, {"num": "6º", "vencimento": "2025-12-10", "valor": 1000.0, "pago": true}, {"num": "7º", "vencimento": "2026-01-10", "valor": 1000.0, "pago": true}, {"num": "8º", "vencimento": "2026-02-10", "valor": 1000.0, "pago": true}, {"num": "9º", "vencimento": "2026-03-10", "valor": 1000.0, "pago": true}, {"num": "10º", "vencimento": "2026-04-10", "valor": 1000.0, "pago": true}, {"num": "11º", "vencimento": "2026-05-10", "valor": 1000.0, "pago": true}, {"num": "12º", "vencimento": "2026-06-10", "valor": 1000.0, "pago": true}, {"num": "13º", "vencimento": "2026-07-10", "valor": 1000.0, "pago": false}, {"num": "14º", "vencimento": "2026-08-10", "valor": 1000.0, "pago": false}, {"num": "15º", "vencimento": "2026-09-10", "valor": 1000.0, "pago": false}, {"num": "16º", "vencimento": "2026-10-10", "valor": 1000.0, "pago": false}, {"num": "17º", "vencimento": "2026-11-10", "valor": 1000.0, "pago": false}, {"num": "18º", "vencimento": "2026-12-10", "valor": 1000.0, "pago": false}, {"num": "19º", "vencimento": "2027-01-10", "valor": 1000.0, "pago": false}, {"num": "20º", "vencimento": "2027-02-10", "valor": 1000.0, "pago": false}]}, {"id": "parc03", "comprador": "Cintia", "veiculo": "", "parcelas": [{"num": "1º", "vencimento": "2025-08-10", "valor": 1240.0, "pago": true}, {"num": "2º", "vencimento": "2025-09-10", "valor": 1240.0, "pago": true}, {"num": "3º", "vencimento": "2025-10-10", "valor": 1240.0, "pago": true}, {"num": "4º", "vencimento": "2025-11-10", "valor": 1240.0, "pago": true}, {"num": "5º", "vencimento": "2025-12-10", "valor": 1240.0, "pago": true}, {"num": "6º", "vencimento": "2026-01-10", "valor": 1240.0, "pago": true}, {"num": "7º", "vencimento": "2026-02-10", "valor": 1240.0, "pago": true}, {"num": "8º", "vencimento": "2026-03-10", "valor": 1240.0, "pago": true}, {"num": "9º", "vencimento": "2026-04-10", "valor": 1240.0, "pago": true}, {"num": "10º", "vencimento": "2026-05-10", "valor": 1240.0, "pago": true}, {"num": "11º", "vencimento": "2026-06-20", "valor": 1240.0, "pago": true}, {"num": "12º", "vencimento": "2026-07-20", "valor": 1240.0, "pago": false}, {"num": "13º", "vencimento": "2026-08-20", "valor": 1240.0, "pago": false}, {"num": "14º", "vencimento": "2026-09-20", "valor": 1240.0, "pago": false}, {"num": "15º", "vencimento": "2026-10-20", "valor": 1240.0, "pago": false}]}, {"id": "parc04", "comprador": "Clarice", "veiculo": "FIESTA PRETO", "parcelas": [{"num": "", "vencimento": "2025-09-24", "valor": 2000.0, "pago": true}, {"num": "", "vencimento": "2025-10-25", "valor": 2000.0, "pago": true}, {"num": "", "vencimento": "2025-11-25", "valor": 2000.0, "pago": true}, {"num": "", "vencimento": "2025-12-25", "valor": 2000.0, "pago": true}, {"num": "", "vencimento": "2026-01-25", "valor": 2000.0, "pago": true}, {"num": "", "vencimento": "2026-02-25", "valor": 2000.0, "pago": true}, {"num": "", "vencimento": "2026-03-25", "valor": 2000.0, "pago": true}, {"num": "", "vencimento": "2026-04-25", "valor": 2000.0, "pago": true}, {"num": "", "vencimento": "2026-05-25", "valor": 2000.0, "pago": true}, {"num": "", "vencimento": "2026-06-25", "valor": 2000.0, "pago": true}, {"num": "", "vencimento": "2026-07-25", "valor": 2000.0, "pago": true}, {"num": "", "vencimento": "2026-08-25", "valor": 2000.0, "pago": true}]}, {"id": "parc05", "comprador": "Edmar", "veiculo": "SWIFT EDMAR", "parcelas": [{"num": "", "vencimento": "2025-12-25", "valor": 56500.0, "pago": true}]}, {"id": "parc06", "comprador": "Bruno", "veiculo": "", "parcelas": [{"num": "", "vencimento": "2025-12-05", "valor": 1000.0, "pago": true}, {"num": "", "vencimento": "2026-01-10", "valor": 600.0, "pago": true}, {"num": "", "vencimento": "2026-02-10", "valor": 600.0, "pago": true}, {"num": "", "vencimento": "2026-03-10", "valor": 600.0, "pago": true}, {"num": "", "vencimento": "2026-04-10", "valor": 600.0, "pago": true}, {"num": "", "vencimento": "2026-05-10", "valor": 600.0, "pago": true}, {"num": "", "vencimento": "2026-06-10", "valor": 600.0, "pago": true}, {"num": "", "vencimento": "2026-07-10", "valor": 600.0, "pago": false}, {"num": "", "vencimento": "2026-08-10", "valor": 600.0, "pago": false}, {"num": "", "vencimento": "2026-09-10", "valor": 600.0, "pago": false}, {"num": "", "vencimento": "2026-10-10", "valor": 600.0, "pago": false}, {"num": "", "vencimento": "2026-11-10", "valor": 600.0, "pago": false}, {"num": "", "vencimento": "2026-12-10", "valor": 600.0, "pago": false}, {"num": "", "vencimento": "2027-01-10", "valor": 600.0, "pago": false}, {"num": "", "vencimento": "2027-02-10", "valor": 600.0, "pago": false}, {"num": "", "vencimento": "2027-03-10", "valor": 600.0, "pago": false}, {"num": "", "vencimento": "2027-03-11", "valor": 600.0, "pago": false}, {"num": "", "vencimento": "2027-02-10", "valor": 600.0, "pago": false}]}, {"id": "parc07", "comprador": "Solange", "veiculo": "", "parcelas": [{"num": "1º", "vencimento": "2024-11-12", "valor": 1000.0, "pago": true}, {"num": "2º", "vencimento": "2024-12-12", "valor": 1000.0, "pago": true}, {"num": "3º", "vencimento": "2025-01-12", "valor": 1000.0, "pago": true}, {"num": "4º", "vencimento": "2025-02-12", "valor": 1000.0, "pago": true}, {"num": "5º", "vencimento": "2025-03-12", "valor": 1000.0, "pago": true}, {"num": "6º", "vencimento": "2025-04-12", "valor": 1000.0, "pago": true}, {"num": "7º", "vencimento": "2025-05-12", "valor": 1000.0, "pago": true}, {"num": "8º", "vencimento": "2025-06-12", "valor": 1000.0, "pago": true}, {"num": "9º", "vencimento": "2025-07-12", "valor": 1000.0, "pago": true}, {"num": "10º", "vencimento": "2025-08-12", "valor": 1000.0, "pago": true}, {"num": "11º", "vencimento": "2025-09-12", "valor": 1000.0, "pago": true}, {"num": "12º", "vencimento": "2025-10-12", "valor": 1000.0, "pago": true}, {"num": "13º", "vencimento": "2025-11-12", "valor": 1000.0, "pago": true}]}, {"id": "parc08", "comprador": "Diego", "veiculo": "Moto", "parcelas": [{"num": "pago", "vencimento": "2026-01-20", "valor": 2000.0, "pago": false}, {"num": "pago", "vencimento": "2026-02-20", "valor": 1000.0, "pago": false}, {"num": "pago", "vencimento": "2026-03-20", "valor": 1000.0, "pago": false}, {"num": "pago", "vencimento": "2026-04-20", "valor": 1000.0, "pago": false}, {"num": "pago", "vencimento": "2026-05-20", "valor": 1000.0, "pago": false}, {"num": "pago", "vencimento": "2026-06-20", "valor": 1000.0, "pago": false}, {"num": "7º", "vencimento": "2026-07-20", "valor": 1000.0, "pago": false}, {"num": "8º", "vencimento": "2026-08-20", "valor": 1000.0, "pago": false}, {"num": "9º", "vencimento": "2026-09-20", "valor": 1000.0, "pago": false}, {"num": "pago", "vencimento": "2026-10-20", "valor": 500.0, "pago": false}]}, {"id": "parc09", "comprador": "Brião", "veiculo": "", "parcelas": [{"num": "pago", "vencimento": "2026-04-10", "valor": 900.0, "pago": false}, {"num": "pago", "vencimento": "2026-04-10", "valor": 16000.0, "pago": false}, {"num": "pago", "vencimento": "2026-05-11", "valor": 900.0, "pago": false}, {"num": "pago", "vencimento": "2026-06-11", "valor": 900.0, "pago": false}, {"num": "4º", "vencimento": "2026-07-11", "valor": 900.0, "pago": false}, {"num": "5º", "vencimento": "2026-08-11", "valor": 900.0, "pago": false}, {"num": "6º", "vencimento": "2026-09-11", "valor": 900.0, "pago": false}, {"num": "7º", "vencimento": "2026-10-11", "valor": 900.0, "pago": false}, {"num": "8º", "vencimento": "2026-11-11", "valor": 900.0, "pago": false}, {"num": "9º", "vencimento": "2026-12-11", "valor": 900.0, "pago": false}, {"num": "10º", "vencimento": "2027-01-11", "valor": 900.0, "pago": false}, {"num": "11º", "vencimento": "2027-02-11", "valor": 900.0, "pago": false}, {"num": "12º", "vencimento": "2027-03-11", "valor": 900.0, "pago": false}, {"num": "13º", "vencimento": "2027-04-11", "valor": 900.0, "pago": false}, {"num": "14º", "vencimento": "2027-05-11", "valor": 900.0, "pago": false}, {"num": "15º", "vencimento": "2027-06-11", "valor": 900.0, "pago": false}, {"num": "16º", "vencimento": "2027-07-11", "valor": 900.0, "pago": false}, {"num": "17º", "vencimento": "2027-08-11", "valor": 900.0, "pago": false}, {"num": "18º", "vencimento": "2027-09-11", "valor": 900.0, "pago": false}, {"num": "19º", "vencimento": "2027-10-11", "valor": 900.0, "pago": false}, {"num": "20º", "vencimento": "2027-11-11", "valor": 900.0, "pago": false}, {"num": "21º", "vencimento": "2027-12-11", "valor": 900.0, "pago": false}, {"num": "22º", "vencimento": "2028-01-11", "valor": 900.0, "pago": false}]}, {"id": "parc10", "comprador": "Alexandre", "veiculo": "GOL", "parcelas": [{"num": "", "vencimento": "2026-02-25", "valor": 1000.0, "pago": true}, {"num": "", "vencimento": "2026-03-25", "valor": 1000.0, "pago": true}, {"num": "", "vencimento": "2026-04-25", "valor": 1000.0, "pago": true}, {"num": "", "vencimento": "2026-05-25", "valor": 1000.0, "pago": true}, {"num": "", "vencimento": "2026-06-25", "valor": 1000.0, "pago": true}, {"num": "", "vencimento": "2026-07-25", "valor": 1000.0, "pago": false}, {"num": "", "vencimento": "2026-08-25", "valor": 1000.0, "pago": false}, {"num": "", "vencimento": "2026-09-25", "valor": 1000.0, "pago": false}, {"num": "", "vencimento": "2026-10-25", "valor": 1000.0, "pago": false}, {"num": "", "vencimento": "2026-11-25", "valor": 1000.0, "pago": false}, {"num": "", "vencimento": "2026-12-25", "valor": 1000.0, "pago": false}, {"num": "", "vencimento": "2027-01-25", "valor": 1000.0, "pago": false}]}, {"id": "parc11", "comprador": "Clarice", "veiculo": "HILUX", "parcelas": [{"num": "1º", "vencimento": "2026-02-10", "valor": 3000.0, "pago": false}, {"num": "pago", "vencimento": "2026-03-10", "valor": 2500.0, "pago": false}, {"num": "pago", "vencimento": "2026-04-10", "valor": 2500.0, "pago": false}, {"num": "pago", "vencimento": "2026-05-10", "valor": 1375.0, "pago": false}, {"num": "pago", "vencimento": "2026-06-10", "valor": 2125.0, "pago": false}, {"num": "6º", "vencimento": "2026-07-10", "valor": 2125.0, "pago": false}, {"num": "-", "vencimento": "2026-07-10", "valor": 18000.0, "pago": false}, {"num": "7º", "vencimento": "2026-08-10", "valor": 2125.0, "pago": false}, {"num": "8º", "vencimento": "2026-09-10", "valor": 2125.0, "pago": false}, {"num": "9º", "vencimento": "2026-10-10", "valor": 2125.0, "pago": false}, {"num": "10º", "vencimento": "2026-11-10", "valor": 2000.0, "pago": false}, {"num": "11º", "vencimento": "2026-12-10", "valor": 2000.0, "pago": false}, {"num": "12º", "vencimento": "2027-01-10", "valor": 2000.0, "pago": false}, {"num": "-", "vencimento": "2027-01-10", "valor": 18000.0, "pago": false}, {"num": "3º", "vencimento": "2027-02-10", "valor": 2000.0, "pago": false}, {"num": "14º", "vencimento": "2027-03-10", "valor": 2000.0, "pago": false}, {"num": "15º", "vencimento": "2027-04-10", "valor": 2000.0, "pago": false}, {"num": "16º", "vencimento": "2027-05-10", "valor": 2000.0, "pago": false}]}]}
+</script>
+
 <script>
-var STORE_KEY = 'autogestao_v1';
+var STORE_KEY = 'autogestao_v2';
+var PEST = 'estoque';
+var PCOMP = 'compras';
+var PVEN = 'vendas';
+var PPARCL = 'parcelamentos';
 var state = loadState();
+
+function getSeed() {
+  try {
+    var el = document.getElementById('seed-data');
+    if (el) return JSON.parse(el.textContent);
+  } catch(e) {}
+  return { vehicles: [], purchases: [], sales: [], parcelamentos: [] };
+}
 
 function loadState() {
   try {
     var raw = localStorage.getItem(STORE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      var s = JSON.parse(raw);
+      if (!s.parcelamentos) { s.parcelamentos = getSeed().parcelamentos; }
+      return s;
+    }
   } catch(e) {}
-  return { vehicles: [], purchases: [], sales: [] };
+  return getSeed();
 }
 
-function saveState() {
-  localStorage.setItem(STORE_KEY, JSON.stringify(state));
-}
+function saveState() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
 
-function genId() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-}
+function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
 
 function fmtBRL(n) {
-  return Number(n || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  return Number(n||0).toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
 }
 
 function fmtDate(d) {
   if (!d) return '-';
-  var parts = d.split('-');
-  return parts[2] + '/' + parts[1] + '/' + parts[0];
+  var p = d.split('-');
+  if (p.length !== 3) return d;
+  return p[2]+'/'+p[1]+'/'+p[0];
 }
 
-function todayISO() {
-  return new Date().toISOString().slice(0, 10);
+function todayISO() { return new Date().toISOString().slice(0,10); }
+
+function diffDays(isoA, isoB) {
+  var a = new Date(isoA), b = new Date(isoB);
+  return Math.round((a - b) / 86400000);
 }
 
 function g(id) { return document.getElementById(id); }
 
 function vehicleLabel(v) {
   if (!v) return '-';
-  return v.marca + ' ' + v.modelo + ' ' + v.ano + (v.placa ? ' - ' + v.placa : '');
+  return v.marca + ' ' + v.modelo + (v.placa ? ' - '+v.placa : '') + (v.ano ? ' ('+v.ano+')' : '');
 }
 
 function vehicleById(id) {
-  for (var i = 0; i < state.vehicles.length; i++) {
-    if (state.vehicles[i].id === id) return state.vehicles[i];
+  for (var i=0; i<state.vehicles.length; i++) {
+    if (state.vehicles[i].id===id) return state.vehicles[i];
   }
   return null;
 }
 
 function purchaseByVehicle(vid) {
-  for (var i = 0; i < state.purchases.length; i++) {
-    if (state.purchases[i].vehicleId === vid) return state.purchases[i];
+  for (var i=0; i<state.purchases.length; i++) {
+    if (state.purchases[i].vehicleId===vid) return state.purchases[i];
   }
   return null;
 }
 
 function saleByVehicle(vid) {
-  for (var i = 0; i < state.sales.length; i++) {
-    if (state.sales[i].vehicleId === vid) return state.sales[i];
+  for (var i=0; i<state.sales.length; i++) {
+    if (state.sales[i].vehicleId===vid) return state.sales[i];
   }
   return null;
 }
 
 function prop(obj, key, def) {
-  return (obj && obj[key] !== undefined && obj[key] !== null && obj[key] !== '') ? obj[key] : (def !== undefined ? def : '');
+  return (obj && obj[key]!==undefined && obj[key]!==null && obj[key]!=='') ? obj[key] : (def!==undefined ? def : '');
 }
 
 function formToObj(form) {
-  var obj = {};
-  var elements = form.elements;
-  for (var i = 0; i < elements.length; i++) {
-    var el = elements[i];
+  var obj={}, els=form.elements;
+  for (var i=0; i<els.length; i++) {
+    var el=els[i];
     if (el.name && !el.disabled) {
-      if (el.type === 'checkbox') { obj[el.name] = el.checked ? el.value : ''; }
-      else { obj[el.name] = el.value; }
+      obj[el.name] = el.type==='checkbox' ? (el.checked ? el.value : '') : el.value;
     }
   }
   return obj;
 }
 
-/* -- Toast -- */
+/* Toast */
 function showToast(msg, type) {
-  type = type || 'success';
+  type = type||'success';
   var el = document.createElement('div');
-  el.className = 'ts ts-' + type.charAt(0);
+  el.className = 'ts ts-'+type.charAt(0);
   el.textContent = msg;
   g('tc').appendChild(el);
-  setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 3200);
+  setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); }, 3200);
 }
 
-/* -- Confirm -- */
+/* Confirm */
 var _confirmResolve = null;
-
 function showConfirm(msg, title) {
-  g('c-title').textContent = title || 'Confirmar exclusao?';
+  g('c-title').textContent = title||'Confirmar?';
   g('c-msg').textContent = msg;
   g('co').classList.remove('hidden');
-  return new Promise(function(res) { _confirmResolve = res; });
+  return new Promise(function(res){ _confirmResolve=res; });
 }
+function confirmOk() { g('co').classList.add('hidden'); if(_confirmResolve) _confirmResolve(true); _confirmResolve=null; }
+function confirmCancel() { g('co').classList.add('hidden'); if(_confirmResolve) _confirmResolve(false); _confirmResolve=null; }
+g('c-ok').onclick=confirmOk; g('c-cancel').onclick=confirmCancel; g('c-close').onclick=confirmCancel;
+g('co').onclick=function(e){ if(e.target===g('co')) confirmCancel(); };
 
-function confirmOk() {
-  g('co').classList.add('hidden');
-  if (_confirmResolve) _confirmResolve(true);
-  _confirmResolve = null;
-}
+/* Modal */
+function openModal(title, html) { g('m-title').textContent=title; g('m-body').innerHTML=html; g('mo').classList.remove('hidden'); }
+function closeModal() { g('mo').classList.add('hidden'); g('m-body').innerHTML=''; }
+g('m-close').onclick=closeModal;
+g('mo').onclick=function(e){ if(e.target===g('mo')) closeModal(); };
 
-function confirmCancel() {
-  g('co').classList.add('hidden');
-  if (_confirmResolve) _confirmResolve(false);
-  _confirmResolve = null;
-}
-
-g('c-ok').onclick = confirmOk;
-g('c-cancel').onclick = confirmCancel;
-g('c-close').onclick = confirmCancel;
-g('co').onclick = function(e) { if (e.target === g('co')) confirmCancel(); };
-
-/* -- Modal -- */
-function openModal(title, html) {
-  g('m-title').textContent = title;
-  g('m-body').innerHTML = html;
-  g('mo').classList.remove('hidden');
-}
-
-function closeModal() {
-  g('mo').classList.add('hidden');
-  g('m-body').innerHTML = '';
-}
-
-g('m-close').onclick = closeModal;
-g('mo').onclick = function(e) { if (e.target === g('mo')) closeModal(); };
-
-/* -- Nav -- */
-var currentPage = 'dashboard';
-
-var PAGE_TITLES = {
-  dashboard: 'Dashboard',
-  estoque: 'Estoque de Veiculos',
-  compras: 'Registro de Compras',
-  vendas: 'Registro de Vendas',
-  relatorios: 'Relatorios Financeiros'
-};
+/* Nav */
+var currentPage='dashboard';
+var PAGE_TITLES={ dashboard:'Dashboard', estoque:'Estoque de Veiculos', compras:'Registro de Compras', vendas:'Registro de Vendas', parcelamentos:'Controle de Parcelamentos', relatorios:'Relatorios Financeiros' };
 
 function navigate(page) {
-  currentPage = page;
-  var items = document.querySelectorAll('.ni');
-  for (var i = 0; i < items.length; i++) {
-    if (items[i].dataset.page === page) items[i].classList.add('active');
+  currentPage=page;
+  var items=document.querySelectorAll('.ni');
+  for (var i=0; i<items.length; i++) {
+    if (items[i].dataset.page===page) items[i].classList.add('active');
     else items[i].classList.remove('active');
   }
-  g('tb-title').textContent = PAGE_TITLES[page] || page;
+  g('tb-title').textContent=PAGE_TITLES[page]||page;
   renderPage(page);
 }
 
-var navItems = document.querySelectorAll('.ni');
-for (var _i = 0; _i < navItems.length; _i++) {
-  (function(el) {
-    el.onclick = function() { navigate(el.dataset.page); };
-  })(navItems[_i]);
+var navItems=document.querySelectorAll('.ni');
+for (var _i=0; _i<navItems.length; _i++) {
+  (function(el){ el.onclick=function(){ navigate(el.dataset.page); }; })(navItems[_i]);
 }
 
 function renderPage(page) {
-  var c = g('content');
-  if (page === 'dashboard') c.innerHTML = pageDashboard();
-  else if (page === 'estoque') c.innerHTML = pageEstoque();
-  else if (page === 'compras') c.innerHTML = pageCompras();
-  else if (page === 'vendas') c.innerHTML = pageVendas();
-  else if (page === 'relatorios') c.innerHTML = pageRelatorios();
+  var c=g('content');
+  if (page==='dashboard') c.innerHTML=pageDashboard();
+  else if (page===PEST) c.innerHTML=pageEstoque();
+  else if (page===PCOMP) c.innerHTML=pageCompras();
+  else if (page===PVEN) c.innerHTML=pageVendas();
+  else if (page===PPARCL) c.innerHTML=pageParcelamentos();
+  else if (page==='relatorios') c.innerHTML=pageRelatorios();
 }
 
-/* -- Status badge -- */
+/* Status badge */
 function statusBadge(s) {
-  if (s === 'disponivel') return '<span class="badge bg">Disponivel</span>';
-  if (s === 'reservado')  return '<span class="badge by">Reservado</span>';
-  if (s === 'vendido')    return '<span class="badge bb">Vendido</span>';
-  return '<span class="badge bgr">' + (s || '-') + '</span>';
+  if (s==='disponivel') return '<span class="badge bg">Disponivel</span>';
+  if (s==='reservado') return '<span class="badge by">Reservado</span>';
+  if (s==='vendido') return '<span class="badge bb">Vendido</span>';
+  return '<span class="badge bgr">'+(s||'-')+'</span>';
 }
 
-/* ------------ DASHBOARD ------------ */
+/* Parcela status badge */
+function parcelaBadge(p, today) {
+  if (p.pago) return '<span class="badge bg">Pago</span>';
+  var d = diffDays(p.vencimento, today);
+  if (d < 0) return '<span class="badge bd">Vencida '+Math.abs(d)+'d</span>';
+  if (d <= 7) return '<span class="badge bo">Vence em '+d+'d</span>';
+  if (d <= 30) return '<span class="badge by">Em '+d+'d</span>';
+  return '<span class="badge bgr">Pendente</span>';
+}
+
+/* ---- DASHBOARD ---- */
 function pageDashboard() {
-  var estoque = [], reservado = [], vendidos = [];
-  for (var i = 0; i < state.vehicles.length; i++) {
-    var v = state.vehicles[i];
-    if (v.status === 'disponivel') estoque.push(v);
-    else if (v.status === 'reservado') reservado.push(v);
-    else if (v.status === 'vendido') vendidos.push(v);
+  var estoque=[], reservado=[], vendidos=[];
+  for (var i=0; i<state.vehicles.length; i++) {
+    var v=state.vehicles[i];
+    if (v.status==='disponivel') estoque.push(v);
+    else if (v.status==='reservado') reservado.push(v);
+    else if (v.status==='vendido') vendidos.push(v);
   }
+  var totalInvest=0, esRes=estoque.concat(reservado);
+  for (var j=0; j<esRes.length; j++) { var pp=purchaseByVehicle(esRes[j].id); if(pp) totalInvest+=Number(pp.valor||0); }
+  var totalReceb=0, totalCusto=0;
+  for (var k=0; k<vendidos.length; k++) {
+    var sv=saleByVehicle(vendidos[k].id); var pv=purchaseByVehicle(vendidos[k].id);
+    if(sv) totalReceb+=Number(sv.valor||0); if(pv) totalCusto+=Number(pv.valor||0);
+  }
+  var lucro=totalReceb-totalCusto;
+  var lucroClass=lucro>=0?'lp':'ln';
+  var margemStr=vendidos.length>0?('Margem: '+(totalCusto>0?((lucro/totalCusto)*100).toFixed(1):'0')+'%'):'Sem vendas';
 
-  var totalInvestido = 0;
-  var esRes = estoque.concat(reservado);
-  for (var j = 0; j < esRes.length; j++) {
-    var p = purchaseByVehicle(esRes[j].id);
-    if (p) totalInvestido += Number(p.valor || 0);
-  }
-
-  var totalRecebido = 0, totalCusto = 0;
-  for (var k = 0; k < vendidos.length; k++) {
-    var sv = saleByVehicle(vendidos[k].id);
-    var pv = purchaseByVehicle(vendidos[k].id);
-    if (sv) totalRecebido += Number(sv.valor || 0);
-    if (pv) totalCusto += Number(pv.valor || 0);
-  }
-  var lucro = totalRecebido - totalCusto;
-  var lucroClass = lucro >= 0 ? 'lp' : 'ln';
-  var margemStr = vendidos.length > 0 ? ('Margem: ' + (totalCusto > 0 ? ((lucro/totalCusto)*100).toFixed(1) : '0') + '%') : 'Sem vendas';
-
-  var actArr = [];
-  for (var pa = 0; pa < state.purchases.length; pa++) {
-    var pu = state.purchases[pa];
-    actArr.push({ type: 'compra', date: pu.data || '', valor: -Number(pu.valor||0), label: vehicleLabel(vehicleById(pu.vehicleId)) });
-  }
-  for (var sa = 0; sa < state.sales.length; sa++) {
-    var sl = state.sales[sa];
-    actArr.push({ type: 'venda', date: sl.data || '', valor: Number(sl.valor||0), label: vehicleLabel(vehicleById(sl.vehicleId)) });
-  }
-  actArr.sort(function(a,b){ return b.date > a.date ? 1 : -1; });
-  if (actArr.length > 8) actArr = actArr.slice(0, 8);
-
-  var actHtml = '';
-  if (actArr.length === 0) {
-    actHtml = '<p class="mu" style="text-align:center;padding:20px 0">Nenhuma atividade ainda.</p>';
-  } else {
-    actHtml = '<ul class="rl">';
-    for (var ai = 0; ai < actArr.length; ai++) {
-      var a = actArr[ai];
-      var vc = a.type === 'compra' ? 'vr' : 'vg';
-      var sign = a.type === 'compra' ? '-' : '+';
-      actHtml += '<li class="ri"><div class="rd ' + a.type + '"></div>';
-      actHtml += '<div class="ri-i"><div class="ri-t">' + a.label + '</div>';
-      actHtml += '<div class="ri-s">' + (a.type === 'compra' ? 'Compra' : 'Venda') + ' - ' + fmtDate(a.date) + '</div></div>';
-      actHtml += '<div class="ri-v ' + vc + '">' + sign + fmtBRL(Math.abs(a.valor)) + '</div></li>';
+  // Parcelamentos summary
+  var today=todayISO();
+  var vencidas=0, aVencer30=0, totalRecebParc=0, totalParc=0;
+  for (var pi=0; pi<state.parcelamentos.length; pi++) {
+    var grupo=state.parcelamentos[pi];
+    for (var pj=0; pj<grupo.parcelas.length; pj++) {
+      var parc=grupo.parcelas[pj];
+      totalParc+=parc.valor;
+      if (parc.pago) { totalRecebParc+=parc.valor; continue; }
+      var dd=diffDays(parc.vencimento, today);
+      if (dd<0) vencidas++;
+      else if (dd<=30) aVencer30++;
     }
-    actHtml += '</ul>';
   }
 
-  var sumHtml = '';
-  if (state.vehicles.length === 0) {
-    sumHtml = '<p class="mu" style="text-align:center;padding:20px 0">Nenhum veiculo cadastrado.</p>';
-    sumHtml += '<div style="text-align:center;margin-top:12px"><button class="btn bp" onclick="navigate(\'estoque\')">+ Cadastrar primeiro veiculo</button></div>';
+  var alertHtml='';
+  if (vencidas>0) {
+    alertHtml='<div class="alert-bar">&#x26A0;&#xFE0F; '+vencidas+' parcela(s) VENCIDA(S)! <button class="btn bd bsm" style="margin-left:auto" onclick="navigate(PPARCL)">Ver agora</button></div>';
+  } else if (aVencer30>0) {
+    alertHtml='<div class="alert-bar warn">&#x1F514; '+aVencer30+' parcela(s) vencem nos proximos 30 dias. <button class="btn bg2 bsm" style="margin-left:auto" onclick="navigate(PPARCL)">Ver</button></div>';
+  }
+
+  var actArr=[];
+  for (var pa=0; pa<state.purchases.length; pa++) {
+    var pu=state.purchases[pa];
+    if (!pu.data) continue;
+    actArr.push({type:'compra',date:pu.data||'',valor:-Number(pu.valor||0),label:vehicleLabel(vehicleById(pu.vehicleId))});
+  }
+  for (var sa=0; sa<state.sales.length; sa++) {
+    var sl=state.sales[sa];
+    if (!sl.data) continue;
+    actArr.push({type:'venda',date:sl.data||'',valor:Number(sl.valor||0),label:vehicleLabel(vehicleById(sl.vehicleId))});
+  }
+  actArr.sort(function(a,b){ return b.date>a.date?1:-1; });
+  if (actArr.length>8) actArr=actArr.slice(0,8);
+
+  var actHtml='';
+  if (actArr.length===0) {
+    actHtml='<p class="mu" style="text-align:center;padding:20px 0">Nenhuma atividade datada ainda.</p>';
   } else {
-    sumHtml = '<table><thead><tr><th>Veiculo</th><th>Status</th><th class="tr">Custo</th></tr></thead><tbody>';
-    var maxShow = Math.min(6, state.vehicles.length);
-    for (var vi = 0; vi < maxShow; vi++) {
-      var vv = state.vehicles[vi];
-      var pp = purchaseByVehicle(vv.id);
-      sumHtml += '<tr><td><div style="font-weight:500">' + vv.marca + ' ' + vv.modelo + '</div>';
-      sumHtml += '<div class="mu">' + vv.ano + (vv.placa ? ' - ' + vv.placa : '') + '</div></td>';
-      sumHtml += '<td>' + statusBadge(vv.status) + '</td>';
-      sumHtml += '<td class="tr">' + (pp ? fmtBRL(pp.valor) : '-') + '</td></tr>';
+    actHtml='<ul class="rl">';
+    for (var ai=0; ai<actArr.length; ai++) {
+      var a=actArr[ai];
+      var vc=a.type==='compra'?'vr':'vg'; var sign=a.type==='compra'?'-':'+';
+      actHtml+='<li class="ri"><div class="rd '+a.type+'"></div>';
+      actHtml+='<div class="ri-i"><div class="ri-t">'+a.label+'</div>';
+      actHtml+='<div class="ri-s">'+(a.type==='compra'?'Compra':'Venda')+' - '+fmtDate(a.date)+'</div></div>';
+      actHtml+='<div class="ri-v '+vc+'">'+sign+fmtBRL(Math.abs(a.valor))+'</div></li>';
     }
-    sumHtml += '</tbody></table>';
+    actHtml+='</ul>';
   }
 
-  return '<div class="kgrid">' +
-    '<div class="kc"><div class="ki" style="background:#dbeafe">&#x1F697;</div><div><div class="lb">Em Estoque</div><div class="vl">' + estoque.length + '</div><div class="sb">' + reservado.length + ' reservado(s)</div></div></div>' +
-    '<div class="kc"><div class="ki" style="background:#fee2e2">&#x1F6D2;</div><div><div class="lb">Total Investido</div><div class="vl" style="font-size:1.1rem">' + fmtBRL(totalInvestido) + '</div><div class="sb">em ' + (estoque.length + reservado.length) + ' veiculo(s)</div></div></div>' +
-    '<div class="kc"><div class="ki" style="background:#dcfce7">&#x2705;</div><div><div class="lb">Total Vendido</div><div class="vl" style="font-size:1.1rem">' + fmtBRL(totalRecebido) + '</div><div class="sb">' + vendidos.length + ' venda(s)</div></div></div>' +
-    '<div class="kc"><div class="ki" style="background:' + (lucro >= 0 ? '#dcfce7' : '#fee2e2') + '">&#x1F4B9;</div><div><div class="lb">Lucro Total</div><div class="vl ' + lucroClass + '" style="font-size:1.1rem">' + fmtBRL(lucro) + '</div><div class="sb">' + margemStr + '</div></div></div>' +
-    '</div>' +
-    '<div class="dg">' +
-    '<div class="card"><div class="ch"><h2>Atividade Recente</h2></div><div class="cb">' + actHtml + '</div></div>' +
-    '<div class="card"><div class="ch"><h2>Resumo do Estoque</h2><button class="btn bp bsm" onclick="navigate(\'estoque\')">Ver tudo</button></div><div class="cb">' + sumHtml + '</div></div>' +
+  var sumHtml='';
+  if (state.vehicles.length===0) {
+    sumHtml='<p class="mu" style="text-align:center;padding:20px 0">Nenhum veiculo cadastrado.</p>';
+    sumHtml+='<div style="text-align:center;margin-top:12px"><button class="btn bp" onclick="navigate(PEST)">+ Cadastrar veiculo</button></div>';
+  } else {
+    sumHtml='<table><thead><tr><th>Veiculo</th><th>Status</th><th class="tr">Custo</th></tr></thead><tbody>';
+    var maxShow=Math.min(6,state.vehicles.length);
+    for (var vi=0; vi<maxShow; vi++) {
+      var vv=state.vehicles[vi]; var pp2=purchaseByVehicle(vv.id);
+      sumHtml+='<tr><td><div style="font-weight:500">'+vv.marca+' '+vv.modelo+'</div>';
+      sumHtml+='<div class="mu">'+vv.ano+(vv.placa?' - '+vv.placa:'')+'</div></td>';
+      sumHtml+='<td>'+statusBadge(vv.status)+'</td>';
+      sumHtml+='<td class="tr">'+(pp2?fmtBRL(pp2.valor):'-')+'</td></tr>';
+    }
+    sumHtml+='</tbody></table>';
+  }
+
+  return alertHtml+
+    '<div class="kgrid">'+
+    '<div class="kc"><div class="ki" style="background:#dbeafe">&#x1F697;</div><div><div class="lb">Em Estoque</div><div class="vl">'+estoque.length+'</div><div class="sb">'+reservado.length+' reservado(s)</div></div></div>'+
+    '<div class="kc"><div class="ki" style="background:#fee2e2">&#x1F6D2;</div><div><div class="lb">Total Investido</div><div class="vl" style="font-size:1.1rem">'+fmtBRL(totalInvest)+'</div><div class="sb">em '+(estoque.length+reservado.length)+' veiculo(s)</div></div></div>'+
+    '<div class="kc"><div class="ki" style="background:#dcfce7">&#x2705;</div><div><div class="lb">Total Vendido</div><div class="vl" style="font-size:1.1rem">'+fmtBRL(totalReceb)+'</div><div class="sb">'+vendidos.length+' venda(s)</div></div></div>'+
+    '<div class="kc"><div class="ki" style="background:'+(lucro>=0?'#dcfce7':'#fee2e2')+'">&#x1F4B9;</div><div><div class="lb">Lucro Total</div><div class="vl '+lucroClass+'" style="font-size:1.1rem">'+fmtBRL(lucro)+'</div><div class="sb">'+margemStr+'</div></div></div>'+
+    '<div class="kc"><div class="ki" style="background:#fef3c7">&#x1F4C5;</div><div><div class="lb">A Receber (Parcelas)</div><div class="vl" style="font-size:1.1rem">'+fmtBRL(totalParc-totalRecebParc)+'</div><div class="sb">'+(vencidas>0?'<span style="color:var(--danger)">'+vencidas+' vencida(s)</span>':aVencer30+' a vencer em 30d')+'</div></div></div>'+
+    '</div>'+
+    '<div class="dg">'+
+    '<div class="card"><div class="ch"><h2>Atividade Recente</h2></div><div class="cb">'+actHtml+'</div></div>'+
+    '<div class="card"><div class="ch"><h2>Resumo do Estoque</h2><button class="btn bp bsm" onclick="navigate(PEST)">Ver tudo</button></div><div class="cb">'+sumHtml+'</div></div>'+
     '</div>';
 }
 
-/* ------------ ESTOQUE ------------ */
-var estoqueQ = '', estoqueStatus = '';
+/* ---- ESTOQUE ---- */
+var estoqueQ='', estoqueStatus='';
 
 function pageEstoque() {
-  var list = [];
-  for (var i = 0; i < state.vehicles.length; i++) {
-    var v = state.vehicles[i];
-    var q = estoqueQ.toLowerCase();
-    var match = !q || (v.marca + ' ' + v.modelo + ' ' + v.ano + ' ' + (v.placa||'') + ' ' + (v.cor||'')).toLowerCase().indexOf(q) !== -1;
-    var sm = !estoqueStatus || v.status === estoqueStatus;
-    if (match && sm) list.push(v);
+  var list=[];
+  for (var i=0; i<state.vehicles.length; i++) {
+    var v=state.vehicles[i];
+    var q=estoqueQ.toLowerCase();
+    var match=!q||(v.marca+' '+v.modelo+' '+v.ano+' '+(v.placa||'')+' '+(v.cor||'')).toLowerCase().indexOf(q)!==-1;
+    var sm=!estoqueStatus||v.status===estoqueStatus;
+    if (match&&sm) list.push(v);
   }
-
-  var rows = '';
-  for (var j = 0; j < list.length; j++) {
-    var vv = list[j];
-    var p = purchaseByVehicle(vv.id);
-    var s = saleByVehicle(vv.id);
-    var custo = Number(p ? p.valor : 0);
-    var venda = Number(s ? s.valor : 0);
-    var lucro = s ? venda - custo : null;
-    var lucroStr = lucro !== null ? '<span class="' + (lucro >= 0 ? 'lp' : 'ln') + '">' + fmtBRL(lucro) + '</span>' : '-';
-    rows += '<tr>' +
-      '<td><div style="font-weight:500">' + vv.marca + ' ' + vv.modelo + '</div><div class="mu">' + vv.ano + ' - ' + (vv.combustivel || 'Flex') + '</div></td>' +
-      '<td><span class="tm">' + (vv.placa || '-') + '</span></td>' +
-      '<td>' + (vv.cor || '-') + '</td>' +
-      '<td>' + (vv.km ? Number(vv.km).toLocaleString('pt-BR') + ' km' : '-') + '</td>' +
-      '<td>' + (custo ? fmtBRL(custo) : '-') + '</td>' +
-      '<td>' + (venda ? fmtBRL(venda) : '-') + '</td>' +
-      '<td>' + lucroStr + '</td>' +
-      '<td>' + statusBadge(vv.status) + '</td>' +
-      '<td><div class="fl g2">' +
-      '<button class="btn bg2 bsm bic" title="Editar" onclick="openVehicleForm(\'' + vv.id + \')">&#x270F;&#xFE0F;</button>' +
-      '<button class="btn bg2 bsm bic" title="Excluir" onclick="deleteVehicle(\'' + vv.id + \')">&#x1F5D1;</button>' +
+  var rows='';
+  for (var j=0; j<list.length; j++) {
+    var vv=list[j]; var p=purchaseByVehicle(vv.id); var s=saleByVehicle(vv.id);
+    var custo=Number(p?p.valor:0); var venda=Number(s?s.valor:0);
+    var lucro=s?venda-custo:null;
+    var lucroStr=lucro!==null?'<span class="'+(lucro>=0?'lp':'ln')+'">'+fmtBRL(lucro)+'</span>':'-';
+    rows+='<tr>'+
+      '<td><div style="font-weight:500">'+vv.marca+' '+vv.modelo+'</div><div class="mu">'+vv.ano+(vv.combustivel?' - '+vv.combustivel:'')+'</div></td>'+
+      '<td><span class="tm">'+(vv.placa||'-')+'</span></td>'+
+      '<td>'+(vv.cor||'-')+'</td>'+
+      '<td>'+(vv.km?Number(vv.km).toLocaleString('pt-BR')+' km':'-')+'</td>'+
+      '<td>'+(custo?fmtBRL(custo):'-')+'</td>'+
+      '<td>'+(venda?fmtBRL(venda):'-')+'</td>'+
+      '<td>'+lucroStr+'</td>'+
+      '<td>'+statusBadge(vv.status)+'</td>'+
+      '<td><div class="fl g2">'+
+      '<button class="btn bg2 bsm bic" title="Editar" onclick="openVehicleForm(\''+ vv.id +'\')">&#x270F;&#xFE0F;</button>'+
+      '<button class="btn bg2 bsm bic" title="Excluir" onclick="deleteVehicle(\''+ vv.id +'\')">&#x1F5D1;</button>'+
       '</div></td></tr>';
   }
-
-  var tableHtml = '';
-  if (list.length === 0) {
-    tableHtml = '<div class="es"><div class="ic">&#x1F697;</div><p>' + (state.vehicles.length === 0 ? 'Nenhum veiculo cadastrado. Clique em "+ Novo Veiculo" para comecar.' : 'Nenhum veiculo encontrado.') + '</p></div>';
+  var tableHtml='';
+  if (list.length===0) {
+    tableHtml='<div class="es"><div class="ic">&#x1F697;</div><p>'+(state.vehicles.length===0?'Nenhum veiculo cadastrado. Clique em &quot;+ Novo Veiculo&quot; para comecar.':'Nenhum veiculo encontrado.')+'</p></div>';
   } else {
-    tableHtml = '<table><thead><tr><th>Veiculo</th><th>Placa</th><th>Cor</th><th>KM</th><th>Custo</th><th>Venda</th><th>Lucro</th><th>Status</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
+    tableHtml='<table><thead><tr><th>Veiculo</th><th>Placa</th><th>Cor</th><th>KM</th><th>Custo</th><th>Venda</th><th>Lucro</th><th>Status</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>';
   }
-
-  var selOpts = '<option value=""' + (!estoqueStatus ? ' selected' : '') + '>Todos os status</option>' +
-    '<option value="disponivel"' + (estoqueStatus === 'disponivel' ? ' selected' : '') + '>Disponivel</option>' +
-    '<option value="reservado"' + (estoqueStatus === 'reservado' ? ' selected' : '') + '>Reservado</option>' +
-    '<option value="vendido"' + (estoqueStatus === 'vendido' ? ' selected' : '') + '>Vendido</option>';
-
-  return '<div class="sb-w">' +
-    '<div class="si-w"><span class="si-ic">&#x1F50D;</span><input type="text" placeholder="Buscar por marca, modelo, placa..." value="' + estoqueQ + '" oninput="estoqueQ=this.value;renderPage(\'estoque\')"></div>' +
-    '<select class="fs" onchange="estoqueStatus=this.value;renderPage(\'estoque\')">" + selOpts + "</select>' +
-    '<button class="btn bp" onclick="openVehicleForm(\'\')>+ Novo Veiculo</button>' +
-    '</div>' +
-    '<div class="card"><div class="ch"><h2>Veiculos (' + list.length + ')</h2></div><div class="tw">' + tableHtml + '</div></div>';
+  var selOpts='<option value=""'+(!estoqueStatus?' selected':'')+'>Todos os status</option>'+
+    '<option value="disponivel"'+(estoqueStatus==='disponivel'?' selected':'')+'>Disponivel</option>'+
+    '<option value="reservado"'+(estoqueStatus==='reservado'?' selected':'')+'>Reservado</option>'+
+    '<option value="vendido"'+(estoqueStatus==='vendido'?' selected':'')+'>Vendido</option>';
+  return '<div class="sb-w">'+
+    '<div class="si-w"><span class="si-ic">&#x1F50D;</span><input type="text" placeholder="Buscar por marca, modelo, placa..." value="'+estoqueQ+'" oninput="estoqueQ=this.value;renderPage(PEST)"></div>'+
+    '<select class="fs" onchange="estoqueStatus=this.value;renderPage(PEST)">'+selOpts+'</select>'+
+    '<button class="btn bp" onclick="openVehicleForm(String())">+ Novo Veiculo</button>'+
+    '</div>'+
+    '<div class="card"><div class="ch"><h2>Veiculos ('+list.length+')</h2></div><div class="tw">'+tableHtml+'</div></div>';
 }
 
 function openVehicleForm(id) {
-  var v = id ? vehicleById(id) : null;
-  var title = v ? 'Editar Veiculo' : 'Novo Veiculo';
-  var fuels = ['Flex','Gasolina','Diesel','Eletrico','Hibrido','GNV'];
-  var fuelOpts = '';
-  for (var i = 0; i < fuels.length; i++) {
-    var sel = ((v && v.combustivel) || 'Flex') === fuels[i] ? ' selected' : '';
-    fuelOpts += '<option' + sel + '>' + fuels[i] + '</option>';
+  var v=id?vehicleById(id):null;
+  var fuels=['Flex','Gasolina','Diesel','Eletrico','Hibrido','GNV']; var fuelOpts='';
+  for (var i=0; i<fuels.length; i++) {
+    var sel=((v&&v.combustivel)||'Flex')===fuels[i]?' selected':'';
+    fuelOpts+='<option'+sel+'>'+fuels[i]+'</option>';
   }
-  var html =
-    '<form id="vf" onsubmit="saveVehicle(event)">' +
-    '<input type="hidden" name="vid" value="' + (id || '') + '">' +
-    '<div class="fg">' +
-    '<div class="fd"><label>Marca *</label><input type="text" name="marca" value="' + prop(v,'marca') + '" placeholder="Ex: Fiat, VW, Toyota" required></div>' +
-    '<div class="fd"><label>Modelo *</label><input type="text" name="modelo" value="' + prop(v,'modelo') + '" placeholder="Ex: Uno, Gol, Corolla" required></div>' +
-    '<div class="fd"><label>Ano *</label><input type="number" name="ano" value="' + prop(v,'ano') + '" placeholder="2020" min="1950" max="2030" required></div>' +
-    '<div class="fd"><label>Placa</label><input type="text" name="placa" value="' + prop(v,'placa') + '" placeholder="ABC-1234" maxlength="10"></div>' +
-    '<div class="fd"><label>Cor</label><input type="text" name="cor" value="' + prop(v,'cor') + '" placeholder="Branco, Preto..."></div>' +
-    '<div class="fd"><label>Combustivel</label><select name="combustivel">' + fuelOpts + '</select></div>' +
-    '<div class="fd"><label>Quilometragem (km)</label><input type="number" name="km" value="' + prop(v,'km') + '" placeholder="0" min="0"></div>' +
-    '<div class="fd"><label>Chassi / RENAVAM</label><input type="text" name="chassi" value="' + prop(v,'chassi') + '" placeholder="Opcional"></div>' +
-    '<div class="fd"><label>Status</label><select name="status">' +
-      '<option value="disponivel"' + (prop(v,'status','disponivel') === 'disponivel' ? ' selected' : '') + '>Disponivel</option>' +
-      '<option value="reservado"' + (prop(v,'status') === 'reservado' ? ' selected' : '') + '>Reservado</option>' +
-      '<option value="vendido"' + (prop(v,'status') === 'vendido' ? ' selected' : '') + '>Vendido</option>' +
-    '</select></div>' +
-    '<div class="fd ffc"><label>Observacoes</label><textarea name="obs">' + prop(v,'obs') + '</textarea></div>' +
-    '</div>' +
-    '<div class="fa"><button type="button" class="btn bg2" onclick="closeModal()">Cancelar</button><button type="submit" class="btn bp">&#x1F4BE; Salvar</button></div>' +
+  var html='<form id="vf" onsubmit="saveVehicle(event)">'+
+    '<input type="hidden" name="vid" value="'+(id||'')+'">'+
+    '<div class="fg">'+
+    '<div class="fd"><label>Marca *</label><input type="text" name="marca" value="'+prop(v,'marca')+'" placeholder="Ex: Fiat, VW, Toyota" required></div>'+
+    '<div class="fd"><label>Modelo *</label><input type="text" name="modelo" value="'+prop(v,'modelo')+'" placeholder="Ex: Uno, Gol, Corolla" required></div>'+
+    '<div class="fd"><label>Ano</label><input type="number" name="ano" value="'+prop(v,'ano')+'" placeholder="2020" min="1950" max="2030"></div>'+
+    '<div class="fd"><label>Placa</label><input type="text" name="placa" value="'+prop(v,'placa')+'" placeholder="ABC-1234" maxlength="10"></div>'+
+    '<div class="fd"><label>Cor</label><input type="text" name="cor" value="'+prop(v,'cor')+'" placeholder="Branco, Preto..."></div>'+
+    '<div class="fd"><label>Combustivel</label><select name="combustivel">'+fuelOpts+'</select></div>'+
+    '<div class="fd"><label>Quilometragem (km)</label><input type="number" name="km" value="'+prop(v,'km')+'" placeholder="0" min="0"></div>'+
+    '<div class="fd"><label>Chassi / RENAVAM</label><input type="text" name="chassi" value="'+prop(v,'chassi')+'" placeholder="Opcional"></div>'+
+    '<div class="fd"><label>Status</label><select name="status">'+
+      '<option value="disponivel"'+(prop(v,'status','disponivel')==='disponivel'?' selected':'')+'>Disponivel</option>'+
+      '<option value="reservado"'+(prop(v,'status')==='reservado'?' selected':'')+'>Reservado</option>'+
+      '<option value="vendido"'+(prop(v,'status')==='vendido'?' selected':'')+'>Vendido</option>'+
+    '</select></div>'+
+    '<div class="fd ffc"><label>Observacoes</label><textarea name="obs">'+prop(v,'obs')+'</textarea></div>'+
+    '</div>'+
+    '<div class="fa"><button type="button" class="btn bg2" onclick="closeModal()">Cancelar</button><button type="submit" class="btn bp">&#x1F4BE; Salvar</button></div>'+
     '</form>';
-  openModal(title, html);
+  openModal(v?'Editar Veiculo':'Novo Veiculo', html);
 }
 
 function saveVehicle(e) {
   e.preventDefault();
-  var d = formToObj(e.target);
-  var id = d.vid;
-  delete d.vid;
+  var d=formToObj(e.target); var id=d.vid; delete d.vid;
   if (id) {
-    for (var i = 0; i < state.vehicles.length; i++) {
-      if (state.vehicles[i].id === id) { state.vehicles[i] = Object.assign({}, state.vehicles[i], d); break; }
+    for (var i=0; i<state.vehicles.length; i++) {
+      if (state.vehicles[i].id===id){ state.vehicles[i]=Object.assign({},state.vehicles[i],d); break; }
     }
     showToast('Veiculo atualizado!');
   } else {
-    d.id = genId();
-    state.vehicles.push(d);
-    showToast('Veiculo cadastrado!');
+    d.id=genId(); state.vehicles.push(d); showToast('Veiculo cadastrado!');
   }
-  saveState(); closeModal(); renderPage('estoque');
+  saveState(); closeModal(); renderPage(PEST);
 }
 
 function deleteVehicle(id) {
-  var v = vehicleById(id);
-  showConfirm('Excluir "' + vehicleLabel(v) + '"? Os registros de compra e venda tambem serao removidos.').then(function(ok) {
-    if (!ok) return;
-    state.vehicles = state.vehicles.filter(function(x) { return x.id !== id; });
-    state.purchases = state.purchases.filter(function(x) { return x.vehicleId !== id; });
-    state.sales = state.sales.filter(function(x) { return x.vehicleId !== id; });
-    saveState(); showToast('Veiculo excluido.', 'error'); renderPage('estoque');
+  var v=vehicleById(id);
+  showConfirm('Excluir "'+vehicleLabel(v)+'"? Os registros de compra e venda tambem serao removidos.').then(function(ok){
+    if(!ok) return;
+    state.vehicles=state.vehicles.filter(function(x){return x.id!==id;});
+    state.purchases=state.purchases.filter(function(x){return x.vehicleId!==id;});
+    state.sales=state.sales.filter(function(x){return x.vehicleId!==id;});
+    saveState(); showToast('Veiculo excluido.','error'); renderPage(PEST);
   });
 }
 
-/* ------------ COMPRAS ------------ */
-var comprasQ = '';
-
+/* ---- COMPRAS ---- */
+var comprasQ='';
 function pageCompras() {
-  var list = [];
-  for (var i = 0; i < state.purchases.length; i++) {
-    var p = state.purchases[i];
-    var v = vehicleById(p.vehicleId);
-    var q = comprasQ.toLowerCase();
-    if (!q || vehicleLabel(v).toLowerCase().indexOf(q) !== -1 || (p.procedencia||'').toLowerCase().indexOf(q) !== -1) {
-      list.push(p);
-    }
+  var list=[];
+  for (var i=0; i<state.purchases.length; i++) {
+    var p=state.purchases[i]; var v=vehicleById(p.vehicleId);
+    var q=comprasQ.toLowerCase();
+    if (!q||vehicleLabel(v).toLowerCase().indexOf(q)!==-1||(p.procedencia||'').toLowerCase().indexOf(q)!==-1) list.push(p);
   }
-  list.sort(function(a,b){ return (b.data||'') > (a.data||'') ? 1 : -1; });
-
-  var total = 0;
-  for (var t = 0; t < list.length; t++) total += Number(list[t].valor || 0);
-
-  var rows = '';
-  for (var j = 0; j < list.length; j++) {
-    var pu = list[j];
-    var vv = vehicleById(pu.vehicleId);
-    rows += '<tr>' +
-      '<td>' + fmtDate(pu.data) + '</td>' +
-      '<td><div style="font-weight:500">' + vehicleLabel(vv) + '</div><div>' + (vv ? statusBadge(vv.status) : '<span class="badge bgr">Removido</span>') + '</div></td>' +
-      '<td>' + (pu.procedencia || '-') + '</td>' +
-      '<td>' + (pu.formaPgto || '-') + '</td>' +
-      '<td class="tr fb" style="color:var(--danger)">' + fmtBRL(pu.valor) + '</td>' +
-      '<td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (pu.obs || '-') + '</td>' +
-      '<td><div class="fl g2">' +
-      '<button class="btn bg2 bsm bic" onclick="openCompraForm(\'' + pu.id + \')">&#x270F;&#xFE0F;</button>' +
-      '<button class="btn bg2 bsm bic" onclick="deleteCompra(\'' + pu.id + \')">&#x1F5D1;</button>' +
+  list.sort(function(a,b){ return (b.data||'')>(a.data||'')?1:-1; });
+  var total=0; for (var t=0; t<list.length; t++) total+=Number(list[t].valor||0);
+  var rows='';
+  for (var j=0; j<list.length; j++) {
+    var pu=list[j]; var vv=vehicleById(pu.vehicleId);
+    rows+='<tr>'+
+      '<td>'+(pu.data?fmtDate(pu.data):'-')+'</td>'+
+      '<td><div style="font-weight:500">'+vehicleLabel(vv)+'</div><div>'+(vv?statusBadge(vv.status):'<span class="badge bgr">Removido</span>')+'</div></td>'+
+      '<td>'+(pu.procedencia||'-')+'</td>'+
+      '<td>'+(pu.formaPgto||'-')+'</td>'+
+      '<td class="tr fb" style="color:var(--danger)">'+fmtBRL(pu.valor)+'</td>'+
+      '<td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(pu.obs||'-')+'</td>'+
+      '<td><div class="fl g2">'+
+      '<button class="btn bg2 bsm bic" onclick="openCompraForm(\''+ pu.id +'\')">&#x270F;&#xFE0F;</button>'+
+      '<button class="btn bg2 bsm bic" onclick="deleteCompra(\''+ pu.id +'\')">&#x1F5D1;</button>'+
       '</div></td></tr>';
   }
-
-  var tableHtml = list.length === 0
-    ? '<div class="es"><div class="ic">&#x1F6D2;</div><p>' + (state.purchases.length === 0 ? 'Nenhuma compra registrada. Clique em "+ Registrar Compra" para comecar.' : 'Nenhuma compra encontrada.') + '</p></div>'
-    : '<table><thead><tr><th>Data</th><th>Veiculo</th><th>Procedencia</th><th>Forma Pgto</th><th class="tr">Valor Pago</th><th>Obs.</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
-
-  return '<div class="sb-w">' +
-    '<div class="si-w"><span class="si-ic">&#x1F50D;</span><input type="text" placeholder="Buscar por veiculo ou procedencia..." value="' + comprasQ + '" oninput="comprasQ=this.value;renderPage(\'compras\')"></div>' +
-    '<button class="btn bp" onclick="openCompraForm(\'\')>+ Registrar Compra</button>' +
-    '</div>' +
-    '<div class="card"><div class="ch"><h2>Compras (' + list.length + ')</h2><span style="font-weight:600;color:var(--danger)">' + fmtBRL(total) + '</span></div>' +
-    '<div class="tw">' + tableHtml + '</div></div>';
+  var tableHtml=list.length===0
+    ?'<div class="es"><div class="ic">&#x1F6D2;</div><p>'+(state.purchases.length===0?'Nenhuma compra registrada. Clique em &quot;+ Registrar Compra&quot; para comecar.':'Nenhuma compra encontrada.')+'</p></div>'
+    :'<table><thead><tr><th>Data</th><th>Veiculo</th><th>Procedencia</th><th>Forma Pgto</th><th class="tr">Valor Pago</th><th>Obs.</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>';
+  return '<div class="sb-w">'+
+    '<div class="si-w"><span class="si-ic">&#x1F50D;</span><input type="text" placeholder="Buscar por veiculo ou procedencia..." value="'+comprasQ+'" oninput="comprasQ=this.value;renderPage(PCOMP)"></div>'+
+    '<button class="btn bp" onclick="openCompraForm(String())">+ Registrar Compra</button>'+
+    '</div>'+
+    '<div class="card"><div class="ch"><h2>Compras ('+list.length+')</h2><span style="font-weight:600;color:var(--danger)">'+fmtBRL(total)+'</span></div>'+
+    '<div class="tw">'+tableHtml+'</div></div>';
 }
 
 function openCompraForm(id) {
-  var p = null;
-  for (var i = 0; i < state.purchases.length; i++) { if (state.purchases[i].id === id) { p = state.purchases[i]; break; } }
-
-  var vOpts = '';
+  var p=null;
+  for (var i=0; i<state.purchases.length; i++) { if(state.purchases[i].id===id){p=state.purchases[i];break;} }
+  var vOpts='';
   if (p) {
-    for (var j = 0; j < state.vehicles.length; j++) {
-      var vv = state.vehicles[j];
-      vOpts += '<option value="' + vv.id + '"' + (vv.id === p.vehicleId ? ' selected' : '') + '>' + vehicleLabel(vv) + '</option>';
+    for (var j=0; j<state.vehicles.length; j++) {
+      var vv=state.vehicles[j];
+      vOpts+='<option value="'+vv.id+'"'+(vv.id===p.vehicleId?' selected':'')+'>'+vehicleLabel(vv)+'</option>';
     }
   } else {
-    var used = {};
-    for (var k = 0; k < state.purchases.length; k++) used[state.purchases[k].vehicleId] = true;
-    for (var m = 0; m < state.vehicles.length; m++) {
-      var vm = state.vehicles[m];
-      if (!used[vm.id]) vOpts += '<option value="' + vm.id + '">' + vehicleLabel(vm) + '</option>';
+    var used={};
+    for (var k=0; k<state.purchases.length; k++) used[state.purchases[k].vehicleId]=true;
+    for (var m=0; m<state.vehicles.length; m++) {
+      var vm=state.vehicles[m];
+      if (!used[vm.id]) vOpts+='<option value="'+vm.id+'">'+vehicleLabel(vm)+'</option>';
     }
   }
-
-  var procs = ['','Particular','Leilao','Concessionaria','Loja','Outro'];
-  var pgtos = ['','Dinheiro','PIX','Transferencia','Cheque','Financiamento','Outro'];
-  var procOpts = '', pgtoOpts = '';
-  for (var pi = 0; pi < procs.length; pi++) { procOpts += '<option' + (prop(p,'procedencia') === procs[pi] ? ' selected' : '') + '>' + procs[pi] + '</option>'; }
-  for (var gi = 0; gi < pgtos.length; gi++) { pgtoOpts += '<option' + (prop(p,'formaPgto') === pgtos[gi] ? ' selected' : '') + '>' + pgtos[gi] + '</option>'; }
-
-  var html =
-    '<form id="cf" onsubmit="saveCompra(event)">' +
-    '<input type="hidden" name="cid" value="' + (id || '') + '">' +
-    '<div class="fg">' +
-    '<div class="fd ffc"><label>Veiculo *</label>' +
-    '<select name="vehicleId" required' + (p ? ' disabled' : '') + '>' +
-    '<option value="">Selecione um veiculo</option>' + vOpts + '</select>' +
-    (p ? '<input type="hidden" name="vehicleId" value="' + p.vehicleId + '">' : '') +
-    '</div>' +
-    '<div class="fd"><label>Data da Compra *</label><input type="date" name="data" value="' + prop(p,'data',todayISO()) + '" required></div>' +
-    '<div class="fd"><label>Valor Pago (R$) *</label><input type="number" name="valor" value="' + prop(p,'valor') + '" placeholder="0.00" min="0" step="0.01" required></div>' +
-    '<div class="fd"><label>Procedencia</label><select name="procedencia">' + procOpts + '</select></div>' +
-    '<div class="fd"><label>Forma de Pagamento</label><select name="formaPgto">' + pgtoOpts + '</select></div>' +
-    '<div class="fd"><label>Custo Extra (R$)</label><input type="number" name="custoExtra" value="' + prop(p,'custoExtra') + '" placeholder="Funilaria, revisao..." min="0" step="0.01"><span class="ht">Despesas adicionais</span></div>' +
-    '<div class="fd ffc"><label>Observacoes</label><textarea name="obs">' + prop(p,'obs') + '</textarea></div>' +
-    '</div>' +
-    '<div class="fa"><button type="button" class="btn bg2" onclick="closeModal()">Cancelar</button><button type="submit" class="btn bp">&#x1F4BE; Salvar</button></div>' +
+  var procs=['','Particular','Leilao','Concessionaria','Loja','Outro'];
+  var pgtos=['','Dinheiro','PIX','Transferencia','Cheque','Financiamento','Outro'];
+  var procOpts='', pgtoOpts='';
+  for (var pi=0; pi<procs.length; pi++) { procOpts+='<option'+(prop(p,'procedencia')===procs[pi]?' selected':'')+'>'+procs[pi]+'</option>'; }
+  for (var gi=0; gi<pgtos.length; gi++) { pgtoOpts+='<option'+(prop(p,'formaPgto')===pgtos[gi]?' selected':'')+'>'+pgtos[gi]+'</option>'; }
+  var html='<form id="cf" onsubmit="saveCompra(event)">'+
+    '<input type="hidden" name="cid" value="'+(id||'')+'">'+
+    '<div class="fg">'+
+    '<div class="fd ffc"><label>Veiculo *</label>'+
+    '<select name="vehicleId" required'+(p?' disabled':'')+'>'+
+    '<option value="">Selecione um veiculo</option>'+vOpts+'</select>'+
+    (p?'<input type="hidden" name="vehicleId" value="'+p.vehicleId+'">':'')+
+    '</div>'+
+    '<div class="fd"><label>Data da Compra</label><input type="date" name="data" value="'+prop(p,'data','')+'"></div>'+
+    '<div class="fd"><label>Valor Pago (R$) *</label><input type="number" name="valor" value="'+prop(p,'valor')+'" placeholder="0.00" min="0" step="0.01" required></div>'+
+    '<div class="fd"><label>Procedencia</label><select name="procedencia">'+procOpts+'</select></div>'+
+    '<div class="fd"><label>Forma de Pagamento</label><select name="formaPgto">'+pgtoOpts+'</select></div>'+
+    '<div class="fd"><label>Custo Extra (R$)</label><input type="number" name="custoExtra" value="'+prop(p,'custoExtra')+'" placeholder="0.00" min="0" step="0.01"><span class="ht">Despesas adicionais</span></div>'+
+    '<div class="fd ffc"><label>Observacoes</label><textarea name="obs">'+prop(p,'obs')+'</textarea></div>'+
+    '</div>'+
+    '<div class="fa"><button type="button" class="btn bg2" onclick="closeModal()">Cancelar</button><button type="submit" class="btn bp">&#x1F4BE; Salvar</button></div>'+
     '</form>';
-  openModal(p ? 'Editar Compra' : 'Registrar Compra', html);
+  openModal(p?'Editar Compra':'Registrar Compra', html);
 }
 
 function saveCompra(e) {
   e.preventDefault();
-  var d = formToObj(e.target);
-  var id = d.cid;
-  delete d.cid;
-  if (!d.vehicleId) { showToast('Selecione um veiculo.', 'error'); return; }
+  var d=formToObj(e.target); var id=d.cid; delete d.cid;
+  if (!d.vehicleId) { showToast('Selecione um veiculo.','error'); return; }
   if (id) {
-    for (var i = 0; i < state.purchases.length; i++) {
-      if (state.purchases[i].id === id) { state.purchases[i] = Object.assign({}, state.purchases[i], d); break; }
+    for (var i=0; i<state.purchases.length; i++) {
+      if(state.purchases[i].id===id){ state.purchases[i]=Object.assign({},state.purchases[i],d); break; }
     }
     showToast('Compra atualizada!');
   } else {
-    if (purchaseByVehicle(d.vehicleId)) { showToast('Este veiculo ja tem uma compra registrada.', 'error'); return; }
-    d.id = genId();
-    state.purchases.push(d);
-    showToast('Compra registrada!');
+    if (purchaseByVehicle(d.vehicleId)) { showToast('Este veiculo ja tem compra registrada.','error'); return; }
+    d.id=genId(); state.purchases.push(d); showToast('Compra registrada!');
   }
-  saveState(); closeModal(); renderPage('compras');
+  saveState(); closeModal(); renderPage(PCOMP);
 }
 
 function deleteCompra(id) {
-  showConfirm('Excluir este registro de compra?').then(function(ok) {
-    if (!ok) return;
-    state.purchases = state.purchases.filter(function(x) { return x.id !== id; });
-    saveState(); showToast('Compra excluida.', 'error'); renderPage('compras');
+  showConfirm('Excluir este registro de compra?').then(function(ok){
+    if(!ok) return;
+    state.purchases=state.purchases.filter(function(x){return x.id!==id;});
+    saveState(); showToast('Compra excluida.','error'); renderPage(PCOMP);
   });
 }
 
-/* ------------ VENDAS ------------ */
-var vendasQ = '';
-
+/* ---- VENDAS ---- */
+var vendasQ='';
 function pageVendas() {
-  var list = [];
-  for (var i = 0; i < state.sales.length; i++) {
-    var s = state.sales[i];
-    var v = vehicleById(s.vehicleId);
-    var q = vendasQ.toLowerCase();
-    if (!q || vehicleLabel(v).toLowerCase().indexOf(q) !== -1 || (s.comprador||'').toLowerCase().indexOf(q) !== -1) {
-      list.push(s);
-    }
+  var list=[];
+  for (var i=0; i<state.sales.length; i++) {
+    var s=state.sales[i]; var v=vehicleById(s.vehicleId);
+    var q=vendasQ.toLowerCase();
+    if (!q||vehicleLabel(v).toLowerCase().indexOf(q)!==-1||(s.comprador||'').toLowerCase().indexOf(q)!==-1) list.push(s);
   }
-  list.sort(function(a,b){ return (b.data||'') > (a.data||'') ? 1 : -1; });
-
-  var total = 0;
-  for (var t = 0; t < list.length; t++) total += Number(list[t].valor || 0);
-
-  var rows = '';
-  for (var j = 0; j < list.length; j++) {
-    var sv = list[j];
-    var vv = vehicleById(sv.vehicleId);
-    var pu = purchaseByVehicle(sv.vehicleId);
-    var custo = Number(pu ? pu.valor : 0) + Number(pu ? pu.custoExtra : 0);
-    var lucro = Number(sv.valor || 0) - custo;
-    rows += '<tr>' +
-      '<td>' + fmtDate(sv.data) + '</td>' +
-      '<td><div style="font-weight:500">' + vehicleLabel(vv) + '</div></td>' +
-      '<td><div>' + (sv.comprador || '-') + '</div>' + (sv.contato ? '<div class="mu">' + sv.contato + '</div>' : '') + '</td>' +
-      '<td>' + (sv.formaPgto || '-') + '</td>' +
-      '<td class="tr">' + (custo ? fmtBRL(custo) : '-') + '</td>' +
-      '<td class="tr fb" style="color:var(--success)">' + fmtBRL(sv.valor) + '</td>' +
-      '<td class="tr"><span class="' + (lucro >= 0 ? 'lp' : 'ln') + '">' + fmtBRL(lucro) + '</span></td>' +
-      '<td><div class="fl g2">' +
-      '<button class="btn bg2 bsm bic" onclick="openVendaForm(\'' + sv.id + \')">&#x270F;&#xFE0F;</button>' +
-      '<button class="btn bg2 bsm bic" onclick="deleteVenda(\'' + sv.id + \')">&#x1F5D1;</button>' +
+  list.sort(function(a,b){ return (b.data||'')>(a.data||'')?1:-1; });
+  var total=0; for (var t=0; t<list.length; t++) total+=Number(list[t].valor||0);
+  var rows='';
+  for (var j=0; j<list.length; j++) {
+    var sv=list[j]; var vv=vehicleById(sv.vehicleId); var pu=purchaseByVehicle(sv.vehicleId);
+    var custo=Number(pu?pu.valor:0)+Number(pu?pu.custoExtra:0);
+    var lucro=Number(sv.valor||0)-custo;
+    rows+='<tr>'+
+      '<td>'+(sv.data?fmtDate(sv.data):'-')+'</td>'+
+      '<td><div style="font-weight:500">'+vehicleLabel(vv)+'</div></td>'+
+      '<td><div>'+(sv.comprador||'-')+'</div>'+(sv.contato?'<div class="mu">'+sv.contato+'</div>':'')+' </td>'+
+      '<td>'+(sv.formaPgto||'-')+'</td>'+
+      '<td class="tr">'+(custo?fmtBRL(custo):'-')+'</td>'+
+      '<td class="tr fb" style="color:var(--success)">'+fmtBRL(sv.valor)+'</td>'+
+      '<td class="tr"><span class="'+(lucro>=0?'lp':'ln')+'">'+fmtBRL(lucro)+'</span></td>'+
+      '<td><div class="fl g2">'+
+      '<button class="btn bg2 bsm bic" onclick="openVendaForm(\''+ sv.id +'\')">&#x270F;&#xFE0F;</button>'+
+      '<button class="btn bg2 bsm bic" onclick="deleteVenda(\''+ sv.id +'\')">&#x1F5D1;</button>'+
       '</div></td></tr>';
   }
-
-  var tableHtml = list.length === 0
-    ? '<div class="es"><div class="ic">&#x1F4B0;</div><p>' + (state.sales.length === 0 ? 'Nenhuma venda registrada. Clique em "+ Registrar Venda" para comecar.' : 'Nenhuma venda encontrada.') + '</p></div>'
-    : '<table><thead><tr><th>Data</th><th>Veiculo</th><th>Comprador</th><th>Forma Pgto</th><th class="tr">Custo</th><th class="tr">Valor Venda</th><th class="tr">Lucro</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
-
-  return '<div class="sb-w">' +
-    '<div class="si-w"><span class="si-ic">&#x1F50D;</span><input type="text" placeholder="Buscar por veiculo ou comprador..." value="' + vendasQ + '" oninput="vendasQ=this.value;renderPage(\'vendas\')"></div>' +
-    '<button class="btn bs" onclick="openVendaForm(\'\')>+ Registrar Venda</button>' +
-    '</div>' +
-    '<div class="card"><div class="ch"><h2>Vendas (' + list.length + ')</h2><span style="font-weight:600;color:var(--success)">' + fmtBRL(total) + '</span></div>' +
-    '<div class="tw">' + tableHtml + '</div></div>';
+  var tableHtml=list.length===0
+    ?'<div class="es"><div class="ic">&#x1F4B0;</div><p>'+(state.sales.length===0?'Nenhuma venda registrada. Clique em &quot;+ Registrar Venda&quot; para comecar.':'Nenhuma venda encontrada.')+'</p></div>'
+    :'<table><thead><tr><th>Data</th><th>Veiculo</th><th>Comprador</th><th>Forma Pgto</th><th class="tr">Custo</th><th class="tr">Valor Venda</th><th class="tr">Lucro</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>';
+  return '<div class="sb-w">'+
+    '<div class="si-w"><span class="si-ic">&#x1F50D;</span><input type="text" placeholder="Buscar por veiculo ou comprador..." value="'+vendasQ+'" oninput="vendasQ=this.value;renderPage(PVEN)"></div>'+
+    '<button class="btn bs" onclick="openVendaForm(String())">+ Registrar Venda</button>'+
+    '</div>'+
+    '<div class="card"><div class="ch"><h2>Vendas ('+list.length+')</h2><span style="font-weight:600;color:var(--success)">'+fmtBRL(total)+'</span></div>'+
+    '<div class="tw">'+tableHtml+'</div></div>';
 }
 
 function openVendaForm(id) {
-  var s = null;
-  for (var i = 0; i < state.sales.length; i++) { if (state.sales[i].id === id) { s = state.sales[i]; break; } }
-
-  var soldIds = {};
-  for (var k = 0; k < state.sales.length; k++) soldIds[state.sales[k].vehicleId] = true;
-
-  var vOpts = '';
-  var vehs = id ? state.vehicles : state.vehicles.filter(function(v) { return !soldIds[v.id]; });
-  for (var j = 0; j < vehs.length; j++) {
-    var vv = vehs[j];
-    vOpts += '<option value="' + vv.id + '"' + (s && vv.id === s.vehicleId ? ' selected' : '') + '>' + vehicleLabel(vv) + '</option>';
+  var s=null;
+  for (var i=0; i<state.sales.length; i++) { if(state.sales[i].id===id){s=state.sales[i];break;} }
+  var soldIds={};
+  for (var k=0; k<state.sales.length; k++) soldIds[state.sales[k].vehicleId]=true;
+  var vOpts='';
+  var vehs=id?state.vehicles:state.vehicles.filter(function(v){return !soldIds[v.id];});
+  for (var j=0; j<vehs.length; j++) {
+    var vv=vehs[j];
+    vOpts+='<option value="'+vv.id+'"'+(s&&vv.id===s.vehicleId?' selected':'')+'>'+vehicleLabel(vv)+'</option>';
   }
-
-  var pgtos = ['','Dinheiro','PIX','Transferencia','Cheque','Financiamento','Outro'];
-  var pgtoOpts = '';
-  for (var gi = 0; gi < pgtos.length; gi++) { pgtoOpts += '<option' + (prop(s,'formaPgto') === pgtos[gi] ? ' selected' : '') + '>' + pgtos[gi] + '</option>'; }
-
-  var html =
-    '<form id="vdf" onsubmit="saveVenda(event)">' +
-    '<input type="hidden" name="sid" value="' + (id || '') + '">' +
-    '<div class="fg">' +
-    '<div class="fd ffc"><label>Veiculo *</label>' +
-    '<select name="vehicleId" required' + (s ? ' disabled' : '') + '>' +
-    '<option value="">Selecione um veiculo</option>' + vOpts + '</select>' +
-    (s ? '<input type="hidden" name="vehicleId" value="' + s.vehicleId + '">' : '') +
-    '</div>' +
-    '<div class="fd"><label>Data da Venda *</label><input type="date" name="data" value="' + prop(s,'data',todayISO()) + '" required></div>' +
-    '<div class="fd"><label>Valor de Venda (R$) *</label><input type="number" name="valor" value="' + prop(s,'valor') + '" placeholder="0.00" min="0" step="0.01" required></div>' +
-    '<div class="fd"><label>Nome do Comprador</label><input type="text" name="comprador" value="' + prop(s,'comprador') + '" placeholder="Nome completo"></div>' +
-    '<div class="fd"><label>Contato</label><input type="text" name="contato" value="' + prop(s,'contato') + '" placeholder="Telefone ou e-mail"></div>' +
-    '<div class="fd"><label>Forma de Pagamento</label><select name="formaPgto">' + pgtoOpts + '</select></div>' +
-    '<div class="fd ffc"><label>Observacoes</label><textarea name="obs">' + prop(s,'obs') + '</textarea></div>' +
-    '</div>' +
-    '<div class="fa"><button type="button" class="btn bg2" onclick="closeModal()">Cancelar</button><button type="submit" class="btn bs">&#x1F4BE; Salvar</button></div>' +
+  var pgtos=['','Dinheiro','PIX','Transferencia','Cheque','Financiamento','Outro']; var pgtoOpts='';
+  for (var gi=0; gi<pgtos.length; gi++) { pgtoOpts+='<option'+(prop(s,'formaPgto')===pgtos[gi]?' selected':'')+'>'+pgtos[gi]+'</option>'; }
+  var html='<form id="vdf" onsubmit="saveVenda(event)">'+
+    '<input type="hidden" name="sid" value="'+(id||'')+'">'+
+    '<div class="fg">'+
+    '<div class="fd ffc"><label>Veiculo *</label>'+
+    '<select name="vehicleId" required'+(s?' disabled':'')+'>'+
+    '<option value="">Selecione um veiculo</option>'+vOpts+'</select>'+
+    (s?'<input type="hidden" name="vehicleId" value="'+s.vehicleId+'">':'')+
+    '</div>'+
+    '<div class="fd"><label>Data da Venda</label><input type="date" name="data" value="'+prop(s,'data','')+'"></div>'+
+    '<div class="fd"><label>Valor de Venda (R$) *</label><input type="number" name="valor" value="'+prop(s,'valor')+'" placeholder="0.00" min="0" step="0.01" required></div>'+
+    '<div class="fd"><label>Nome do Comprador</label><input type="text" name="comprador" value="'+prop(s,'comprador')+'" placeholder="Nome completo"></div>'+
+    '<div class="fd"><label>Contato</label><input type="text" name="contato" value="'+prop(s,'contato')+'" placeholder="Telefone ou e-mail"></div>'+
+    '<div class="fd"><label>Forma de Pagamento</label><select name="formaPgto">'+pgtoOpts+'</select></div>'+
+    '<div class="fd ffc"><label>Observacoes</label><textarea name="obs">'+prop(s,'obs')+'</textarea></div>'+
+    '</div>'+
+    '<div class="fa"><button type="button" class="btn bg2" onclick="closeModal()">Cancelar</button><button type="submit" class="btn bs">&#x1F4BE; Salvar</button></div>'+
     '</form>';
-  openModal(s ? 'Editar Venda' : 'Registrar Venda', html);
+  openModal(s?'Editar Venda':'Registrar Venda', html);
 }
 
 function saveVenda(e) {
   e.preventDefault();
-  var d = formToObj(e.target);
-  var id = d.sid;
-  delete d.sid;
-  if (!d.vehicleId) { showToast('Selecione um veiculo.', 'error'); return; }
+  var d=formToObj(e.target); var id=d.sid; delete d.sid;
+  if (!d.vehicleId) { showToast('Selecione um veiculo.','error'); return; }
   if (id) {
-    for (var i = 0; i < state.sales.length; i++) {
-      if (state.sales[i].id === id) { state.sales[i] = Object.assign({}, state.sales[i], d); break; }
+    for (var i=0; i<state.sales.length; i++) {
+      if(state.sales[i].id===id){ state.sales[i]=Object.assign({},state.sales[i],d); break; }
     }
     showToast('Venda atualizada!');
   } else {
-    if (saleByVehicle(d.vehicleId)) { showToast('Este veiculo ja foi vendido.', 'error'); return; }
-    d.id = genId();
-    state.sales.push(d);
-    for (var j = 0; j < state.vehicles.length; j++) {
-      if (state.vehicles[j].id === d.vehicleId) { state.vehicles[j].status = 'vendido'; break; }
+    if (saleByVehicle(d.vehicleId)) { showToast('Este veiculo ja foi vendido.','error'); return; }
+    d.id=genId(); state.sales.push(d);
+    for (var j=0; j<state.vehicles.length; j++) {
+      if(state.vehicles[j].id===d.vehicleId){ state.vehicles[j].status='vendido'; break; }
     }
     showToast('Venda registrada!');
   }
-  saveState(); closeModal(); renderPage('vendas');
+  saveState(); closeModal(); renderPage(PVEN);
 }
 
 function deleteVenda(id) {
-  var s = null;
-  for (var i = 0; i < state.sales.length; i++) { if (state.sales[i].id === id) { s = state.sales[i]; break; } }
-  showConfirm('Excluir este registro de venda? O veiculo voltara ao estoque como Disponivel.').then(function(ok) {
-    if (!ok) return;
-    if (s) {
-      for (var j = 0; j < state.vehicles.length; j++) {
-        if (state.vehicles[j].id === s.vehicleId && state.vehicles[j].status === 'vendido') {
-          state.vehicles[j].status = 'disponivel'; break;
-        }
-      }
-    }
-    state.sales = state.sales.filter(function(x) { return x.id !== id; });
-    saveState(); showToast('Venda excluida.', 'error'); renderPage('vendas');
+  var s=null;
+  for (var i=0; i<state.sales.length; i++) { if(state.sales[i].id===id){s=state.sales[i];break;} }
+  showConfirm('Excluir esta venda? O veiculo voltara ao estoque como Disponivel.').then(function(ok){
+    if(!ok) return;
+    if(s){ for(var j=0;j<state.vehicles.length;j++){ if(state.vehicles[j].id===s.vehicleId&&state.vehicles[j].status==='vendido'){state.vehicles[j].status='disponivel';break;} } }
+    state.sales=state.sales.filter(function(x){return x.id!==id;});
+    saveState(); showToast('Venda excluida.','error'); renderPage(PVEN);
   });
 }
 
-/* ------------ RELATORIOS ------------ */
-function pageRelatorios() {
-  var rows = [];
-  for (var i = 0; i < state.vehicles.length; i++) {
-    var v = state.vehicles[i];
-    var p = purchaseByVehicle(v.id);
-    var s = saleByVehicle(v.id);
-    var custo = Number(p ? p.valor : 0) + Number(p ? p.custoExtra : 0);
-    var venda = Number(s ? s.valor : 0);
-    var lucro = s ? venda - custo : null;
-    var margem = (custo && lucro !== null) ? (lucro / custo * 100) : null;
-    rows.push({ v: v, p: p, s: s, custo: custo, venda: venda, lucro: lucro, margem: margem });
+/* ---- PARCELAMENTOS ---- */
+var parcelQ='';
+
+function pageParcelamentos() {
+  var today=todayISO();
+  var list=state.parcelamentos;
+  if (parcelQ) {
+    var q=parcelQ.toLowerCase();
+    list=list.filter(function(g){ return g.comprador.toLowerCase().indexOf(q)!==-1||(g.veiculo||'').toLowerCase().indexOf(q)!==-1; });
   }
 
-  var vendidos = rows.filter(function(r) { return r.s; });
-  var totalCusto = 0, totalVenda = 0;
-  for (var j = 0; j < vendidos.length; j++) { totalCusto += vendidos[j].custo; totalVenda += vendidos[j].venda; }
-  var totalLucro = totalVenda - totalCusto;
-  var margemMedia = vendidos.length && totalCusto ? (totalLucro / totalCusto * 100) : 0;
-  var emEstoque = rows.filter(function(r) { return !r.s && r.p; });
-  var invEstoque = 0;
-  for (var e = 0; e < emEstoque.length; e++) invEstoque += emEstoque[e].custo;
-
-  var maxLucro = 1;
-  for (var ml = 0; ml < vendidos.length; ml++) { if (Math.abs(vendidos[ml].lucro || 0) > maxLucro) maxLucro = Math.abs(vendidos[ml].lucro || 0); }
-
-  var pgtoMap = {};
-  for (var ps = 0; ps < state.sales.length; ps++) {
-    var k = state.sales[ps].formaPgto || 'Nao inf.';
-    pgtoMap[k] = (pgtoMap[k] || 0) + 1;
-  }
-  var pgtoEntries = [];
-  for (var pk in pgtoMap) { pgtoEntries.push([pk, pgtoMap[pk]]); }
-  pgtoEntries.sort(function(a,b){ return b[1]-a[1]; });
-
-  var lucroClass = totalLucro >= 0 ? 'lp' : 'ln';
-
-  var lucroRows = '';
-  if (vendidos.length === 0) {
-    lucroRows = '<div class="es" style="padding:30px"><p>Nenhuma venda registrada ainda.</p></div>';
-  } else {
-    vendidos.sort(function(a,b){ return (b.lucro||0)-(a.lucro||0); });
-    lucroRows = '<table class="pbt"><thead><tr><th>Veiculo</th><th class="tr">Custo</th><th class="tr">Venda</th><th class="tr">Lucro</th><th>Margem</th></tr></thead><tbody>';
-    for (var li = 0; li < vendidos.length; li++) {
-      var r = vendidos[li];
-      var lc = (r.lucro||0) >= 0 ? 'lp' : 'ln';
-      var bw = Math.round(Math.abs(r.lucro||0)/maxLucro*100);
-      var bc = (r.lucro||0) < 0 ? ' ng' : '';
-      lucroRows += '<tr><td>' + vehicleLabel(r.v) + '</td>' +
-        '<td class="tr">' + fmtBRL(r.custo) + '</td>' +
-        '<td class="tr">' + fmtBRL(r.venda) + '</td>' +
-        '<td class="tr"><span class="' + lc + '">' + fmtBRL(r.lucro) + '</span></td>' +
-        '<td><div class="pbw"><div class="pb' + bc + '" style="width:' + bw + 'px"></div>' +
-        '<span class="' + lc + '" style="font-size:.78rem">' + (r.margem !== null ? r.margem.toFixed(1)+'%' : '-') + '</span></div></td></tr>';
+  // Compute overdue/upcoming totals
+  var totalVencido=0, totalAVencer=0, totalPago=0, totalGeral=0;
+  for (var ai=0; ai<state.parcelamentos.length; ai++) {
+    var ag=state.parcelamentos[ai];
+    for (var aj=0; aj<ag.parcelas.length; aj++) {
+      var ap=ag.parcelas[aj]; totalGeral+=ap.valor;
+      if (ap.pago) { totalPago+=ap.valor; continue; }
+      var dd=diffDays(ap.vencimento, today);
+      if (dd<0) totalVencido+=ap.valor;
+      else totalAVencer+=ap.valor;
     }
-    lucroRows += '</tbody></table>';
   }
 
-  var pgtoHtml = '';
-  if (pgtoEntries.length === 0) {
-    pgtoHtml = '<p class="mu" style="text-align:center;padding:20px 0">Sem dados ainda.</p>';
-  } else {
-    pgtoHtml = '<table><thead><tr><th>Forma</th><th class="tr">Qtd</th><th class="tr">%</th></tr></thead><tbody>';
-    for (var pi2 = 0; pi2 < pgtoEntries.length; pi2++) {
-      var pct = state.sales.length ? ((pgtoEntries[pi2][1]/state.sales.length)*100).toFixed(0)+'%' : '-';
-      pgtoHtml += '<tr><td>' + pgtoEntries[pi2][0] + '</td><td class="tr">' + pgtoEntries[pi2][1] + '</td><td class="tr">' + pct + '</td></tr>';
+  // Alert
+  var alertHtml='';
+  var vencGrupos=[];
+  for (var vi=0; vi<state.parcelamentos.length; vi++) {
+    var vg=state.parcelamentos[vi];
+    for (var vj=0; vj<vg.parcelas.length; vj++) {
+      var vp=vg.parcelas[vj];
+      if (!vp.pago && diffDays(vp.vencimento, today)<0) { vencGrupos.push(vg.comprador+(vg.veiculo?' ('+vg.veiculo+')':'')); break; }
     }
-    pgtoHtml += '</tbody></table>';
+  }
+  if (vencGrupos.length) {
+    alertHtml='<div class="alert-bar">&#x26A0;&#xFE0F; Parcelas VENCIDAS: '+vencGrupos.join(', ')+'</div>';
   }
 
-  var allRows = '';
-  if (rows.length === 0) {
-    allRows = '<div class="es" style="padding:30px"><div class="ic">&#x1F697;</div><p>Nenhum veiculo cadastrado.</p></div>';
-  } else {
-    allRows = '<table class="pbt"><thead><tr><th>Veiculo</th><th>Status</th><th>Compra</th><th class="tr">Custo</th><th>Venda</th><th class="tr">Valor</th><th class="tr">Lucro</th></tr></thead><tbody>';
-    for (var ri = 0; ri < rows.length; ri++) {
-      var row = rows[ri];
-      var rlc = row.lucro !== null ? (row.lucro >= 0 ? 'lp' : 'ln') : '';
-      var rls = row.lucro !== null ? '<span class="' + rlc + '">' + fmtBRL(row.lucro) + '</span>' : '-';
-      allRows += '<tr><td>' + vehicleLabel(row.v) + '</td><td>' + statusBadge(row.v.status) + '</td>' +
-        '<td>' + (row.p ? fmtDate(row.p.data) : '-') + '</td><td class="tr">' + (row.custo ? fmtBRL(row.custo) : '-') + '</td>' +
-        '<td>' + (row.s ? fmtDate(row.s.data) : '-') + '</td><td class="tr">' + (row.venda ? fmtBRL(row.venda) : '-') + '</td>' +
-        '<td class="tr">' + rls + '</td></tr>';
+  // Build blocks
+  var blocksHtml='';
+  for (var bi=0; bi<list.length; bi++) {
+    var grupo=list[bi];
+    var pago=0, pendente=0, vencidas=0, proxVenc='';
+    for (var bj=0; bj<grupo.parcelas.length; bj++) {
+      var parc=grupo.parcelas[bj];
+      if (parc.pago) pago++;
+      else {
+        pendente++;
+        if (!proxVenc||parc.vencimento<proxVenc) proxVenc=parc.vencimento;
+        if (diffDays(parc.vencimento, today)<0) vencidas++;
+      }
     }
-    allRows += '<tr style="background:var(--g50);font-weight:700"><td colspan="3">TOTAL (vendidos)</td>' +
-      '<td class="tr">' + fmtBRL(totalCusto) + '</td><td></td><td class="tr">' + fmtBRL(totalVenda) + '</td>' +
-      '<td class="tr"><span class="' + lucroClass + '">' + fmtBRL(totalLucro) + '</span></td></tr>';
-    allRows += '</tbody></table>';
+    var total2=0;
+    for (var bt=0; bt<grupo.parcelas.length; bt++) total2+=grupo.parcelas[bt].valor;
+    var pagoPct=grupo.parcelas.length?Math.round(pago/grupo.parcelas.length*100):0;
+    var hdrClass=vencidas>0?'border-left:4px solid var(--danger)':pendente===0?'border-left:4px solid var(--success)':'';
+
+    var parcsHtml='';
+    for (var pk=0; pk<grupo.parcelas.length; pk++) {
+      var p2=grupo.parcelas[pk];
+      var pst=parcelaBadge(p2, today);
+      var btnPago=p2.pago
+        ?('<button class="btn bg2 bsm" onclick="unmarkPago(\''+ grupo.id +'\','+pk+')">Desfazer</button>')
+        :('<button class="btn bs bsm" onclick="markPago(\''+ grupo.id +'\','+pk+')">Marcar Pago</button>');
+      parcsHtml+='<div class="parc-row">'+
+        '<div class="parc-num">'+(p2.num||String(pk+1))+'</div>'+
+        '<div class="parc-date">'+fmtDate(p2.vencimento)+'</div>'+
+        '<div class="parc-val">'+fmtBRL(p2.valor)+'</div>'+
+        '<div class="parc-sta">'+pst+'</div>'+
+        '<div class="parc-btn">'+btnPago+'</div>'+
+        '</div>';
+    }
+
+    var blockId='pb'+bi;
+    blocksHtml+='<div class="parc-block">'+
+      '<div class="parc-hdr" onclick="toggleParcBlock(\''+ blockId +'\')" style="'+hdrClass+'">'+
+      '<div>'+
+      '<div style="font-weight:600;font-size:.92rem">'+grupo.comprador+(grupo.veiculo?' <span class="mu">'+grupo.veiculo+'</span>':'')+'</div>'+
+      '<div class="mu" style="margin-top:3px">'+pago+'/'+grupo.parcelas.length+' pagas &middot; Total: '+fmtBRL(total2)+(proxVenc?' &middot; Prox: '+fmtDate(proxVenc):'')+'</div>'+
+      '</div>'+
+      '<div style="display:flex;align-items:center;gap:10px;flex-shrink:0">'+
+      (vencidas>0?'<span class="badge bd">'+vencidas+' vencida(s)</span>':pendente===0?'<span class="badge bg">Quitado</span>':'<span class="badge by">'+pendente+' pendente(s)</span>')+
+      '<div class="prog-bar-bg"><div class="prog-bar'+(pagoPct===0?' zero':pagoPct<100?' partial':'')+'" style="width:'+pagoPct+'%"></div></div>'+
+      '<button class="btn bd bsm bic" onclick="event.stopPropagation();deleteParcelamento(\''+ grupo.id +'\')" title="Excluir grupo">&#x1F5D1;</button>'+
+      '</div>'+
+      '</div>'+
+      '<div class="parc-body" id="'+blockId+'">'+parcsHtml+'</div>'+
+      '</div>';
   }
 
-  return '<div class="kgrid">' +
-    '<div class="kc"><div class="ki" style="background:#fee2e2">&#x1F4B8;</div><div><div class="lb">Total Comprado</div><div class="vl" style="font-size:1.05rem">' + fmtBRL(totalCusto) + '</div><div class="sb">' + vendidos.length + ' veiculo(s) vendido(s)</div></div></div>' +
-    '<div class="kc"><div class="ki" style="background:#dcfce7">&#x1F4B5;</div><div><div class="lb">Total Recebido</div><div class="vl" style="font-size:1.05rem">' + fmtBRL(totalVenda) + '</div><div class="sb">em ' + vendidos.length + ' venda(s)</div></div></div>' +
-    '<div class="kc"><div class="ki" style="background:' + (totalLucro >= 0 ? '#dcfce7' : '#fee2e2') + '">&#x1F4C8;</div><div><div class="lb">Lucro Liquido</div><div class="vl ' + lucroClass + '" style="font-size:1.05rem">' + fmtBRL(totalLucro) + '</div><div class="sb">Margem: ' + margemMedia.toFixed(1) + '%</div></div></div>' +
-    '<div class="kc"><div class="ki" style="background:#dbeafe">&#x1F4CA;</div><div><div class="lb">Capital em Estoque</div><div class="vl" style="font-size:1.05rem">' + fmtBRL(invEstoque) + '</div><div class="sb">' + emEstoque.length + ' veiculo(s)</div></div></div>' +
-    '</div>' +
-    '<div class="dg">' +
-    '<div class="card"><div class="ch"><h2>Lucratividade por Veiculo</h2></div><div class="tw">' + lucroRows + '</div></div>' +
-    '<div class="card"><div class="ch"><h2>Formas de Pagamento</h2></div><div class="cb">' + pgtoHtml + '</div></div>' +
-    '</div>' +
-    '<div class="card mt4"><div class="ch"><h2>Todos os Veiculos - Analise Completa</h2></div><div class="tw">' + allRows + '</div></div>';
+  if (list.length===0) {
+    blocksHtml='<div class="es"><div class="ic">&#x1F4C5;</div><p>Nenhum parcelamento encontrado. Clique em &quot;+ Novo Parcelamento&quot; para comecar.</p></div>';
+  }
+
+  return alertHtml+
+    '<div class="kgrid">'+
+    '<div class="kc"><div class="ki" style="background:#dcfce7">&#x2705;</div><div><div class="lb">Total Recebido</div><div class="vl" style="font-size:1.1rem">'+fmtBRL(totalPago)+'</div><div class="sb">de '+state.parcelamentos.length+' grupos</div></div></div>'+
+    '<div class="kc"><div class="ki" style="background:#fee2e2">&#x26A0;&#xFE0F;</div><div><div class="lb">Vencido (nao pago)</div><div class="vl ln" style="font-size:1.1rem">'+fmtBRL(totalVencido)+'</div><div class="sb">valor em atraso</div></div></div>'+
+    '<div class="kc"><div class="ki" style="background:#fef3c7">&#x1F4C5;</div><div><div class="lb">A Receber</div><div class="vl" style="font-size:1.1rem">'+fmtBRL(totalAVencer)+'</div><div class="sb">parcelas futuras</div></div></div>'+
+    '<div class="kc"><div class="ki" style="background:#dbeafe">&#x1F4B0;</div><div><div class="lb">Total Geral</div><div class="vl" style="font-size:1.1rem">'+fmtBRL(totalGeral)+'</div><div class="sb">'+state.parcelamentos.length+' grupos cadastrados</div></div></div>'+
+    '</div>'+
+    '<div class="sb-w">'+
+    '<div class="si-w"><span class="si-ic">&#x1F50D;</span><input type="text" placeholder="Buscar por comprador ou veiculo..." value="'+parcelQ+'" oninput="parcelQ=this.value;renderPage(PPARCL)"></div>'+
+    '<button class="btn bp" onclick="openParcelamentoForm(String())">+ Novo Parcelamento</button>'+
+    '</div>'+
+    '<div>'+blocksHtml+'</div>';
 }
 
-/* -- Init -- */
-g('tb-date').textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+function toggleParcBlock(id) {
+  var el=document.getElementById(id);
+  if (!el) return;
+  if (el.classList.contains('open')) el.classList.remove('open');
+  else el.classList.add('open');
+}
+
+function markPago(groupId, idx) {
+  for (var i=0; i<state.parcelamentos.length; i++) {
+    if (state.parcelamentos[i].id===groupId) {
+      state.parcelamentos[i].parcelas[idx].pago=true;
+      saveState(); showToast('Parcela marcada como paga!'); renderPage(PPARCL); return;
+    }
+  }
+}
+
+function unmarkPago(groupId, idx) {
+  for (var i=0; i<state.parcelamentos.length; i++) {
+    if (state.parcelamentos[i].id===groupId) {
+      state.parcelamentos[i].parcelas[idx].pago=false;
+      saveState(); showToast('Parcela desmarcada.','info'); renderPage(PPARCL); return;
+    }
+  }
+}
+
+function deleteParcelamento(id) {
+  showConfirm('Excluir este grupo de parcelamento?').then(function(ok){
+    if(!ok) return;
+    state.parcelamentos=state.parcelamentos.filter(function(g){return g.id!==id;});
+    saveState(); showToast('Parcelamento excluido.','error'); renderPage(PPARCL);
+  });
+}
+
+function openParcelamentoForm(id) {
+  var grupo=null;
+  for (var i=0; i<state.parcelamentos.length; i++) { if(state.parcelamentos[i].id===id){grupo=state.parcelamentos[i];break;} }
+  var html='<form id="parcf" onsubmit="saveParcelamento(event)">'+
+    '<input type="hidden" name="pid" value="'+(id||'')+'">'+
+    '<div class="fg">'+
+    '<div class="fd"><label>Comprador *</label><input type="text" name="comprador" value="'+prop(grupo,'comprador')+'" required placeholder="Nome do comprador"></div>'+
+    '<div class="fd"><label>Veiculo</label><input type="text" name="veiculo" value="'+prop(grupo,'veiculo')+'" placeholder="Ex: HILUX, GOL"></div>'+
+    '<div class="fd"><label>Numero de Parcelas *</label><input type="number" name="numParcelas" value="12" min="1" max="120" required></div>'+
+    '<div class="fd"><label>Valor por Parcela (R$) *</label><input type="number" name="valorParcela" value="" min="0" step="0.01" required placeholder="0.00"></div>'+
+    '<div class="fd"><label>Data 1a Parcela *</label><input type="date" name="dataInicio" value="'+todayISO()+'" required></div>'+
+    '<div class="fd"><label>Dia de Vencimento</label><input type="number" name="diaVenc" value="10" min="1" max="28" placeholder="10"></div>'+
+    '</div>'+
+    '<div class="fa"><button type="button" class="btn bg2" onclick="closeModal()">Cancelar</button><button type="submit" class="btn bp">&#x1F4BE; Salvar</button></div>'+
+    '</form>';
+  openModal('Novo Parcelamento', html);
+}
+
+function saveParcelamento(e) {
+  e.preventDefault();
+  var d=formToObj(e.target);
+  var id=d.pid; delete d.pid;
+  var n=parseInt(d.numParcelas)||1;
+  var val=parseFloat(d.valorParcela)||0;
+  var dataIni=d.dataInicio;
+  var diaVenc=parseInt(d.diaVenc)||10;
+  var parcelas=[];
+  for (var i=0; i<n; i++) {
+    var dt=new Date(dataIni);
+    dt.setMonth(dt.getMonth()+i);
+    dt.setDate(diaVenc);
+    var isoD=dt.getFullYear()+'-'+(dt.getMonth()+1<10?'0':'')+String(dt.getMonth()+1)+'-'+(dt.getDate()<10?'0':'')+String(dt.getDate());
+    parcelas.push({ num:String(i+1), vencimento:isoD, valor:val, pago:false });
+  }
+  if (id) {
+    for (var j=0; j<state.parcelamentos.length; j++) {
+      if(state.parcelamentos[j].id===id){ state.parcelamentos[j].comprador=d.comprador; state.parcelamentos[j].veiculo=d.veiculo; break; }
+    }
+    showToast('Parcelamento atualizado!');
+  } else {
+    state.parcelamentos.push({ id:genId(), comprador:d.comprador, veiculo:d.veiculo, parcelas:parcelas });
+    showToast('Parcelamento cadastrado!');
+  }
+  saveState(); closeModal(); renderPage(PPARCL);
+}
+
+/* ---- RELATORIOS ---- */
+function pageRelatorios() {
+  var rows=[];
+  for (var i=0; i<state.vehicles.length; i++) {
+    var v=state.vehicles[i]; var p=purchaseByVehicle(v.id); var s=saleByVehicle(v.id);
+    var custo=Number(p?p.valor:0)+Number(p?p.custoExtra:0);
+    var venda=Number(s?s.valor:0);
+    var lucro=s?venda-custo:null;
+    var margem=(custo&&lucro!==null)?(lucro/custo*100):null;
+    rows.push({v:v,p:p,s:s,custo:custo,venda:venda,lucro:lucro,margem:margem});
+  }
+  var vendidos=rows.filter(function(r){return r.s;});
+  var totalCusto=0, totalVenda=0;
+  for (var j=0; j<vendidos.length; j++) { totalCusto+=vendidos[j].custo; totalVenda+=vendidos[j].venda; }
+  var totalLucro=totalVenda-totalCusto;
+  var margemMedia=vendidos.length&&totalCusto?(totalLucro/totalCusto*100):0;
+  var emEstoque=rows.filter(function(r){return !r.s&&r.p;});
+  var invEstoque=0; for (var e=0; e<emEstoque.length; e++) invEstoque+=emEstoque[e].custo;
+  var maxLucro=1;
+  for (var ml=0; ml<vendidos.length; ml++) { if(Math.abs(vendidos[ml].lucro||0)>maxLucro) maxLucro=Math.abs(vendidos[ml].lucro||0); }
+  var pgtoMap={};
+  for (var ps=0; ps<state.sales.length; ps++) {
+    var k=state.sales[ps].formaPgto||'Nao inf.';
+    pgtoMap[k]=(pgtoMap[k]||0)+1;
+  }
+  var pgtoEntries=[]; for (var pk in pgtoMap) pgtoEntries.push([pk,pgtoMap[pk]]);
+  pgtoEntries.sort(function(a,b){return b[1]-a[1];});
+  var lucroClass=totalLucro>=0?'lp':'ln';
+  var lucroRows='';
+  if (vendidos.length===0) {
+    lucroRows='<div class="es" style="padding:30px"><p>Nenhuma venda registrada ainda.</p></div>';
+  } else {
+    vendidos.sort(function(a,b){return (b.lucro||0)-(a.lucro||0);});
+    lucroRows='<table class="pbt"><thead><tr><th>Veiculo</th><th class="tr">Custo</th><th class="tr">Venda</th><th class="tr">Lucro</th><th>Margem</th></tr></thead><tbody>';
+    for (var li=0; li<vendidos.length; li++) {
+      var r=vendidos[li]; var lc=(r.lucro||0)>=0?'lp':'ln';
+      var bw=Math.round(Math.abs(r.lucro||0)/maxLucro*100); var bc=(r.lucro||0)<0?' ng':'';
+      lucroRows+='<tr><td>'+vehicleLabel(r.v)+'</td>'+
+        '<td class="tr">'+fmtBRL(r.custo)+'</td>'+
+        '<td class="tr">'+fmtBRL(r.venda)+'</td>'+
+        '<td class="tr"><span class="'+lc+'">'+fmtBRL(r.lucro)+'</span></td>'+
+        '<td><div class="pbw"><div class="pb'+bc+'" style="width:'+bw+'px"></div>'+
+        '<span class="'+lc+'" style="font-size:.78rem">'+(r.margem!==null?r.margem.toFixed(1)+'%':'-')+'</span></div></td></tr>';
+    }
+    lucroRows+='</tbody></table>';
+  }
+  var pgtoHtml='';
+  if (pgtoEntries.length===0) {
+    pgtoHtml='<p class="mu" style="text-align:center;padding:20px 0">Sem dados ainda.</p>';
+  } else {
+    pgtoHtml='<table><thead><tr><th>Forma</th><th class="tr">Qtd</th><th class="tr">%</th></tr></thead><tbody>';
+    for (var pi2=0; pi2<pgtoEntries.length; pi2++) {
+      var pct=state.sales.length?((pgtoEntries[pi2][1]/state.sales.length)*100).toFixed(0)+'%':'-';
+      pgtoHtml+='<tr><td>'+pgtoEntries[pi2][0]+'</td><td class="tr">'+pgtoEntries[pi2][1]+'</td><td class="tr">'+pct+'</td></tr>';
+    }
+    pgtoHtml+='</tbody></table>';
+  }
+  var allRows='';
+  if (rows.length===0) {
+    allRows='<div class="es" style="padding:30px"><div class="ic">&#x1F697;</div><p>Nenhum veiculo cadastrado.</p></div>';
+  } else {
+    allRows='<table class="pbt"><thead><tr><th>Veiculo</th><th>Status</th><th>Compra</th><th class="tr">Custo</th><th>Venda</th><th class="tr">Valor</th><th class="tr">Lucro</th></tr></thead><tbody>';
+    for (var ri=0; ri<rows.length; ri++) {
+      var row=rows[ri]; var rlc=row.lucro!==null?(row.lucro>=0?'lp':'ln'):'';
+      var rls=row.lucro!==null?'<span class="'+rlc+'">'+fmtBRL(row.lucro)+'</span>':'-';
+      allRows+='<tr><td>'+vehicleLabel(row.v)+'</td><td>'+statusBadge(row.v.status)+'</td>'+
+        '<td>'+(row.p&&row.p.data?fmtDate(row.p.data):'-')+'</td><td class="tr">'+(row.custo?fmtBRL(row.custo):'-')+'</td>'+
+        '<td>'+(row.s&&row.s.data?fmtDate(row.s.data):'-')+'</td><td class="tr">'+(row.venda?fmtBRL(row.venda):'-')+'</td>'+
+        '<td class="tr">'+rls+'</td></tr>';
+    }
+    allRows+='<tr style="background:var(--g50);font-weight:700"><td colspan="3">TOTAL (vendidos)</td>'+
+      '<td class="tr">'+fmtBRL(totalCusto)+'</td><td></td><td class="tr">'+fmtBRL(totalVenda)+'</td>'+
+      '<td class="tr"><span class="'+lucroClass+'">'+fmtBRL(totalLucro)+'</span></td></tr>';
+    allRows+='</tbody></table>';
+  }
+  return '<div class="kgrid">'+
+    '<div class="kc"><div class="ki" style="background:#fee2e2">&#x1F4B8;</div><div><div class="lb">Total Comprado</div><div class="vl" style="font-size:1.05rem">'+fmtBRL(totalCusto)+'</div><div class="sb">'+vendidos.length+' veiculo(s) vendido(s)</div></div></div>'+
+    '<div class="kc"><div class="ki" style="background:#dcfce7">&#x1F4B5;</div><div><div class="lb">Total Recebido</div><div class="vl" style="font-size:1.05rem">'+fmtBRL(totalVenda)+'</div><div class="sb">em '+vendidos.length+' venda(s)</div></div></div>'+
+    '<div class="kc"><div class="ki" style="background:'+(totalLucro>=0?'#dcfce7':'#fee2e2')+'">&#x1F4C8;</div><div><div class="lb">Lucro Liquido</div><div class="vl '+lucroClass+'" style="font-size:1.05rem">'+fmtBRL(totalLucro)+'</div><div class="sb">Margem: '+margemMedia.toFixed(1)+'%</div></div></div>'+
+    '<div class="kc"><div class="ki" style="background:#dbeafe">&#x1F4CA;</div><div><div class="lb">Capital em Estoque</div><div class="vl" style="font-size:1.05rem">'+fmtBRL(invEstoque)+'</div><div class="sb">'+emEstoque.length+' veiculo(s)</div></div></div>'+
+    '</div>'+
+    '<div class="dg">'+
+    '<div class="card"><div class="ch"><h2>Lucratividade por Veiculo</h2></div><div class="tw">'+lucroRows+'</div></div>'+
+    '<div class="card"><div class="ch"><h2>Formas de Pagamento</h2></div><div class="cb">'+pgtoHtml+'</div></div>'+
+    '</div>'+
+    '<div class="card mt4"><div class="ch"><h2>Todos os Veiculos - Analise Completa</h2></div><div class="tw">'+allRows+'</div></div>';
+}
+
+/* Init */
+g('tb-date').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
 renderPage('dashboard');
 </script>
 </body>
