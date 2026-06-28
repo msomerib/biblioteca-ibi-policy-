@@ -36,10 +36,8 @@
 
     html, body { height: 100%; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--gray-100); color: var(--gray-800); font-size: 14px; }
 
-    /* ── Layout ── */
     #app { display: flex; height: 100vh; overflow: hidden; }
 
-    /* ── Sidebar ── */
     #sidebar {
       width: var(--sidebar-w);
       background: var(--gray-900);
@@ -89,7 +87,6 @@
     .nav-item.active { background: var(--primary); color: #fff; }
     .nav-item .icon { font-size: 1rem; width: 20px; text-align: center; }
 
-    /* ── Main ── */
     #main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
 
     .topbar {
@@ -107,7 +104,6 @@
 
     .page { padding: 28px; flex: 1; }
 
-    /* ── Cards ── */
     .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
     .kpi-card {
       background: #fff;
@@ -129,7 +125,6 @@
     .kpi-card .value { font-size: 1.5rem; font-weight: 700; color: var(--gray-800); margin-top: 4px; line-height: 1; }
     .kpi-card .sub { font-size: .78rem; color: var(--gray-400); margin-top: 4px; }
 
-    /* ── Section card ── */
     .card {
       background: #fff;
       border-radius: var(--radius);
@@ -148,7 +143,6 @@
     .card-body { padding: 20px; }
     .card + .card { margin-top: 20px; }
 
-    /* ── Tables ── */
     .table-wrap { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; font-size: .85rem; }
     th {
@@ -175,7 +169,6 @@
     .empty-state .icon { font-size: 2.5rem; margin-bottom: 10px; }
     .empty-state p { font-size: .9rem; }
 
-    /* ── Badges ── */
     .badge {
       display: inline-flex; align-items: center;
       padding: 3px 10px;
@@ -190,7 +183,6 @@
     .badge-blue { background: var(--primary-light); color: var(--primary); }
     .badge-gray { background: var(--gray-100); color: var(--gray-600); }
 
-    /* ── Buttons ── */
     .btn {
       display: inline-flex; align-items: center; gap: 6px;
       padding: 8px 16px;
@@ -214,7 +206,6 @@
     .btn-sm { padding: 5px 10px; font-size: .78rem; }
     .btn-icon { padding: 5px 8px; }
 
-    /* ── Forms ── */
     .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
     .form-col-2 { grid-column: span 2; }
     .form-col-full { grid-column: 1 / -1; }
@@ -239,7 +230,6 @@
     .field .hint { font-size: .75rem; color: var(--gray-400); }
     .form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--gray-100); }
 
-    /* ── Modal ── */
     .modal-overlay {
       position: fixed; inset: 0;
       background: rgba(0,0,0,.45);
@@ -272,7 +262,6 @@
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-    /* ── Search bar ── */
     .search-bar {
       display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
       margin-bottom: 16px;
@@ -286,7 +275,6 @@
     .search-input-wrap input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(29,78,216,.12); }
     .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--gray-400); font-size: .9rem; pointer-events: none; }
 
-    /* ── Dashboard specifics ── */
     .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
     .recent-list { list-style: none; }
     .recent-item {
@@ -305,13 +293,11 @@
     .val-red { color: var(--danger); }
     .val-green { color: var(--success); }
 
-    /* ── Reports ── */
     .report-table td:first-child { font-weight: 500; }
     .profit-bar-wrap { display: flex; align-items: center; gap: 8px; }
     .profit-bar { height: 8px; border-radius: 4px; background: var(--success); min-width: 4px; }
     .profit-bar.neg { background: var(--danger); }
 
-    /* ── Filters ── */
     .filter-select {
       padding: 8px 12px;
       border: 1px solid var(--gray-300);
@@ -321,7 +307,6 @@
       cursor: pointer;
     }
 
-    /* ── Responsive ── */
     @media (max-width: 768px) {
       #sidebar { width: 52px; }
       .sidebar-logo .logo-title, .sidebar-logo .logo-sub, .nav-section-label, .nav-item span { display: none; }
@@ -343,13 +328,11 @@
     .lucro-negative { color: var(--danger); font-weight: 600; }
     .text-muted { color: var(--gray-400); font-size: .82rem; }
 
-    /* ── Confirm dialog ── */
     .confirm-modal .modal { max-width: 400px; }
     .confirm-body { padding: 24px; }
     .confirm-body p { color: var(--gray-600); margin-bottom: 20px; font-size: .9rem; }
     .confirm-actions { display: flex; gap: 10px; justify-content: flex-end; }
 
-    /* ── Toast ── */
     #toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 2000; display: flex; flex-direction: column; gap: 8px; }
     .toast {
       padding: 12px 18px; border-radius: 8px; color: #fff; font-size: .87rem;
@@ -364,7 +347,6 @@
 </head>
 <body>
 <div id="app">
-  <!-- Sidebar -->
   <nav id="sidebar">
     <div class="sidebar-logo">
       <div class="logo-title">&#x1F697; AutoGestão</div>
@@ -391,7 +373,6 @@
     </div>
   </nav>
 
-  <!-- Main -->
   <div id="main">
     <div class="topbar">
       <div class="topbar-title" id="topbar-title">Dashboard</div>
@@ -403,7 +384,6 @@
   </div>
 </div>
 
-<!-- Modal -->
 <div class="modal-overlay hidden" id="modal-overlay">
   <div class="modal" id="modal-box">
     <div class="modal-header">
@@ -414,7 +394,6 @@
   </div>
 </div>
 
-<!-- Confirm -->
 <div class="modal-overlay hidden confirm-modal" id="confirm-overlay">
   <div class="modal" id="confirm-box">
     <div class="modal-header">
@@ -431,13 +410,11 @@
   </div>
 </div>
 
-<!-- Toast -->
 <div id="toast-container"></div>
 
 <script>
 'use strict';
 
-/* ── Storage ── */
 const STORE_KEY = 'autogestao_v1';
 
 function loadState() {
@@ -454,12 +431,10 @@ function saveState() {
 
 let state = loadState();
 
-/* ── ID Gen ── */
 function genId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 }
 
-/* ── Formatting ── */
 function fmtBRL(n) {
   return Number(n || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
@@ -474,7 +449,6 @@ function todayISO() {
   return new Date().toISOString().slice(0, 10);
 }
 
-/* ── Vehicle helpers ── */
 function vehicleLabel(v) {
   if (!v) return '—';
   return `${v.marca} ${v.modelo} ${v.ano}${v.placa ? ' • ' + v.placa : ''}`;
@@ -492,7 +466,6 @@ function saleByVehicle(vid) {
   return state.sales.find(s => s.vehicleId === vid);
 }
 
-/* ── Toast ── */
 const Toast = {
   show(msg, type = 'success') {
     const el = document.createElement('div');
@@ -503,7 +476,6 @@ const Toast = {
   }
 };
 
-/* ── Confirm ── */
 const Confirm = {
   _resolve: null,
   show(msg, title = 'Confirmar exclusão?') {
@@ -525,7 +497,6 @@ const Confirm = {
 };
 document.getElementById('confirm-ok').onclick = () => Confirm.ok();
 
-/* ── Modal ── */
 const Modal = {
   open(title, html) {
     document.getElementById('modal-title').textContent = title;
@@ -544,7 +515,6 @@ document.getElementById('confirm-overlay').addEventListener('click', e => {
   if (e.target === document.getElementById('confirm-overlay')) Confirm.cancel();
 });
 
-/* ── Nav ── */
 let currentPage = 'dashboard';
 
 function navigate(page) {
@@ -559,7 +529,6 @@ document.querySelectorAll('.nav-item').forEach(el => {
   el.addEventListener('click', () => navigate(el.dataset.page));
 });
 
-/* ── Pages ── */
 function renderPage(page) {
   const container = document.getElementById('page-content');
   switch (page) {
@@ -571,7 +540,6 @@ function renderPage(page) {
   }
 }
 
-/* ──────────────────────────────── DASHBOARD ──────────────────────────────── */
 function pageDashboard() {
   const estoque = state.vehicles.filter(v => v.status === 'disponivel');
   const reservado = state.vehicles.filter(v => v.status === 'reservado');
@@ -592,7 +560,6 @@ function pageDashboard() {
   });
   const lucro = totalRecebido - totalCusto;
 
-  // Recent activity
   const activity = [
     ...state.purchases.map(p => ({ type: 'compra', date: p.data, valor: -Number(p.valor||0), label: vehicleLabel(vehicleById(p.vehicleId)), id: p.id })),
     ...state.sales.map(s => ({ type: 'venda', date: s.data, valor: Number(s.valor||0), label: vehicleLabel(vehicleById(s.vehicleId)), id: s.id }))
@@ -672,7 +639,6 @@ function pageDashboard() {
   </div>`;
 }
 
-/* ──────────────────────────────── ESTOQUE ──────────────────────────────── */
 let estoqueFilter = { q: '', status: '' };
 
 function pageEstoque() {
@@ -833,7 +799,6 @@ async function deleteVehicle(id) {
   saveState(); Toast.show('Veículo excluído.', 'error'); renderPage('estoque');
 }
 
-/* ──────────────────────────────── COMPRAS ──────────────────────────────── */
 let comprasFilter = { q: '' };
 
 function pageCompras() {
@@ -970,7 +935,6 @@ async function deleteCompra(id) {
   saveState(); Toast.show('Compra excluída.', 'error'); renderPage('compras');
 }
 
-/* ──────────────────────────────── VENDAS ──────────────────────────────── */
 let vendasFilter = { q: '' };
 
 function pageVendas() {
@@ -1032,7 +996,6 @@ function pageVendas() {
 
 function openVendaForm(id) {
   const s = id ? state.sales.find(x => x.id === id) : null;
-  const dispVenda = state.vehicles.filter(v => v.status !== 'vendido' || (s && v.id === s.vehicleId));
   const vendidosIds = new Set(state.sales.map(x => x.vehicleId));
   const opts = (id
     ? state.vehicles
@@ -1096,7 +1059,6 @@ function saveVenda(e, id) {
   } else {
     if (saleByVehicle(data.vehicleId)) { Toast.show('Este veículo já foi vendido.', 'error'); return; }
     state.sales.push({ id: genId(), ...data });
-    // Mark vehicle as sold
     const vidx = state.vehicles.findIndex(v => v.id === data.vehicleId);
     if (vidx !== -1) state.vehicles[vidx].status = 'vendido';
   }
@@ -1115,9 +1077,7 @@ async function deleteVenda(id) {
   saveState(); Toast.show('Venda excluída.', 'error'); renderPage('vendas');
 }
 
-/* ──────────────────────────────── RELATÓRIOS ──────────────────────────────── */
 function pageRelatorios() {
-  // Per-vehicle analysis
   const rows = state.vehicles.map(v => {
     const p = purchaseByVehicle(v.id);
     const s = saleByVehicle(v.id);
@@ -1134,10 +1094,8 @@ function pageRelatorios() {
   const totalLucro = totalVenda - totalCusto;
   const margemMedia = vendidos.length && totalCusto ? (totalLucro / totalCusto * 100) : 0;
   const investimentoEmEstoque = rows.filter(r => !r.s && r.p).reduce((a, r) => a + r.custo, 0);
-
   const maxLucro = Math.max(...vendidos.map(r => Math.abs(r.lucro || 0)), 1);
 
-  // By formaPgto
   const pgtoMap = {};
   state.sales.forEach(s => { const k = s.formaPgto || 'Não inf.'; pgtoMap[k] = (pgtoMap[k] || 0) + 1; });
   const pgtoEntries = Object.entries(pgtoMap).sort((a, b) => b[1] - a[1]);
@@ -1224,9 +1182,7 @@ function pageRelatorios() {
   </div>
 
   <div class="card mt-4">
-    <div class="card-header">
-      <h2>Todos os Veículos — Análise Completa</h2>
-    </div>
+    <div class="card-header"><h2>Todos os Veículos — Análise Completa</h2></div>
     <div class="table-wrap">
       ${rows.length === 0 ? '<div class="empty-state" style="padding:30px"><div class="icon">&#x1F697;</div><p>Nenhum veículo cadastrado.</p></div>' : `
       <table class="report-table">
@@ -1255,7 +1211,6 @@ function pageRelatorios() {
   </div>`;
 }
 
-/* ── Init ── */
 function init() {
   document.getElementById('topbar-date').textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
   renderPage('dashboard');
