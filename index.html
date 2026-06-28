@@ -1,61 +1,1267 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Política de Privacidade — Biblioteca IBI</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AutoGestão — Compra e Venda de Veículos</title>
   <style>
-    :root { --fg: #0f172a; --muted:#475569; --accent:#2563eb; }
-    html,body{margin:0;padding:0;background:#fff;color:var(--fg);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif}
-    .wrap{max-width:860px;margin:0 auto;padding:40px 20px}
-    h1{font-size:clamp(1.6rem,2.6vw,2.2rem);margin:0 0 8px}
-    h2{font-size:1.25rem;margin:28px 0 8px}
-    p,li{color:var(--muted)}
-    .meta{color:var(--muted);font-size:.95rem;margin-bottom:24px}
-    a{color:var(--accent);text-decoration:none}
-    a:hover{text-decoration:underline}
-    .footer{margin-top:40px;font-size:.9rem;color:var(--muted)}
-    .badge{display:inline-block;border:1px solid #e2e8f0;border-radius:999px;padding:2px 10px;margin-top:6px;font-size:.8rem;color:#475569}
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #1d4ed8;
+      --primary-dark: #1e3a8a;
+      --primary-light: #dbeafe;
+      --success: #16a34a;
+      --success-light: #dcfce7;
+      --danger: #dc2626;
+      --danger-light: #fee2e2;
+      --warning: #d97706;
+      --warning-light: #fef3c7;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-400: #94a3b8;
+      --gray-500: #64748b;
+      --gray-600: #475569;
+      --gray-700: #334155;
+      --gray-800: #1e293b;
+      --gray-900: #0f172a;
+      --sidebar-w: 240px;
+      --radius: 10px;
+      --shadow: 0 1px 3px rgba(0,0,0,.1), 0 1px 2px rgba(0,0,0,.06);
+      --shadow-md: 0 4px 6px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.06);
+      --shadow-lg: 0 10px 15px rgba(0,0,0,.1), 0 4px 6px rgba(0,0,0,.05);
+    }
+
+    html, body { height: 100%; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--gray-100); color: var(--gray-800); font-size: 14px; }
+
+    /* ── Layout ── */
+    #app { display: flex; height: 100vh; overflow: hidden; }
+
+    /* ── Sidebar ── */
+    #sidebar {
+      width: var(--sidebar-w);
+      background: var(--gray-900);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+    .sidebar-logo {
+      padding: 22px 20px 18px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .sidebar-logo .logo-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.2;
+    }
+    .sidebar-logo .logo-sub {
+      font-size: .75rem;
+      color: var(--gray-400);
+      margin-top: 2px;
+    }
+    .sidebar-nav { padding: 12px 8px; flex: 1; }
+    .nav-section-label {
+      font-size: .68rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--gray-500);
+      padding: 14px 12px 6px;
+      font-weight: 600;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--gray-400);
+      font-size: .88rem;
+      font-weight: 500;
+      transition: background .15s, color .15s;
+      margin-bottom: 2px;
+    }
+    .nav-item:hover { background: rgba(255,255,255,.06); color: #fff; }
+    .nav-item.active { background: var(--primary); color: #fff; }
+    .nav-item .icon { font-size: 1rem; width: 20px; text-align: center; }
+
+    /* ── Main ── */
+    #main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+
+    .topbar {
+      background: #fff;
+      border-bottom: 1px solid var(--gray-200);
+      padding: 0 28px;
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .topbar-title { font-size: 1rem; font-weight: 600; color: var(--gray-800); }
+    .topbar-right { display: flex; align-items: center; gap: 10px; }
+
+    .page { padding: 28px; flex: 1; }
+
+    /* ── Cards ── */
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .kpi-card {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    .kpi-icon {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .kpi-card .label { font-size: .78rem; color: var(--gray-500); font-weight: 500; text-transform: uppercase; letter-spacing: .04em; }
+    .kpi-card .value { font-size: 1.5rem; font-weight: 700; color: var(--gray-800); margin-top: 4px; line-height: 1; }
+    .kpi-card .sub { font-size: .78rem; color: var(--gray-400); margin-top: 4px; }
+
+    /* ── Section card ── */
+    .card {
+      background: #fff;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--gray-100);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .card-header h2 { font-size: .95rem; font-weight: 600; color: var(--gray-800); }
+    .card-body { padding: 20px; }
+    .card + .card { margin-top: 20px; }
+
+    /* ── Tables ── */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+    th {
+      background: var(--gray-50);
+      padding: 10px 14px;
+      text-align: left;
+      font-size: .75rem;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--gray-500);
+      font-weight: 600;
+      border-bottom: 1px solid var(--gray-200);
+      white-space: nowrap;
+    }
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--gray-100);
+      color: var(--gray-700);
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--gray-50); }
+    .empty-state { padding: 40px 20px; text-align: center; color: var(--gray-400); }
+    .empty-state .icon { font-size: 2.5rem; margin-bottom: 10px; }
+    .empty-state p { font-size: .9rem; }
+
+    /* ── Badges ── */
+    .badge {
+      display: inline-flex; align-items: center;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: .73rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .badge-green { background: var(--success-light); color: var(--success); }
+    .badge-red { background: var(--danger-light); color: var(--danger); }
+    .badge-yellow { background: var(--warning-light); color: var(--warning); }
+    .badge-blue { background: var(--primary-light); color: var(--primary); }
+    .badge-gray { background: var(--gray-100); color: var(--gray-600); }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 16px;
+      border-radius: 7px;
+      font-size: .85rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: filter .15s, transform .1s;
+      white-space: nowrap;
+    }
+    .btn:active { transform: scale(.98); }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { filter: brightness(1.1); }
+    .btn-success { background: var(--success); color: #fff; }
+    .btn-success:hover { filter: brightness(1.1); }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-danger:hover { filter: brightness(1.1); }
+    .btn-ghost { background: transparent; color: var(--gray-600); border: 1px solid var(--gray-200); }
+    .btn-ghost:hover { background: var(--gray-50); }
+    .btn-sm { padding: 5px 10px; font-size: .78rem; }
+    .btn-icon { padding: 5px 8px; }
+
+    /* ── Forms ── */
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+    .form-col-2 { grid-column: span 2; }
+    .form-col-full { grid-column: 1 / -1; }
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label { font-size: .8rem; font-weight: 600; color: var(--gray-600); }
+    .field input, .field select, .field textarea {
+      padding: 9px 12px;
+      border: 1px solid var(--gray-300);
+      border-radius: 7px;
+      font-size: .9rem;
+      color: var(--gray-800);
+      background: #fff;
+      transition: border-color .15s, box-shadow .15s;
+      font-family: inherit;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(29,78,216,.12);
+    }
+    .field textarea { resize: vertical; min-height: 80px; }
+    .field .hint { font-size: .75rem; color: var(--gray-400); }
+    .form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--gray-100); }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.45);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+      animation: fadeIn .15s ease;
+    }
+    .modal-overlay.hidden { display: none; }
+    .modal {
+      background: #fff;
+      border-radius: 12px;
+      width: 100%; max-width: 640px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+      animation: slideUp .2s ease;
+    }
+    .modal-header {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--gray-100);
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; background: #fff; z-index: 1;
+    }
+    .modal-header h3 { font-size: 1rem; font-weight: 600; }
+    .modal-body { padding: 20px 24px 24px; }
+    .modal-close { background: none; border: none; cursor: pointer; font-size: 1.3rem; color: var(--gray-400); line-height: 1; padding: 2px; }
+    .modal-close:hover { color: var(--gray-700); }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    /* ── Search bar ── */
+    .search-bar {
+      display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .search-input-wrap { position: relative; flex: 1; min-width: 180px; }
+    .search-input-wrap input {
+      width: 100%; padding: 8px 12px 8px 34px;
+      border: 1px solid var(--gray-300); border-radius: 7px;
+      font-size: .85rem; color: var(--gray-800);
+    }
+    .search-input-wrap input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(29,78,216,.12); }
+    .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--gray-400); font-size: .9rem; pointer-events: none; }
+
+    /* ── Dashboard specifics ── */
+    .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .recent-list { list-style: none; }
+    .recent-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .recent-item:last-child { border-bottom: none; }
+    .recent-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .recent-dot.compra { background: var(--danger); }
+    .recent-dot.venda { background: var(--success); }
+    .recent-info { flex: 1; min-width: 0; }
+    .recent-title { font-size: .85rem; font-weight: 500; color: var(--gray-800); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .recent-sub { font-size: .78rem; color: var(--gray-400); }
+    .recent-val { font-size: .85rem; font-weight: 600; white-space: nowrap; }
+    .val-red { color: var(--danger); }
+    .val-green { color: var(--success); }
+
+    /* ── Reports ── */
+    .report-table td:first-child { font-weight: 500; }
+    .profit-bar-wrap { display: flex; align-items: center; gap: 8px; }
+    .profit-bar { height: 8px; border-radius: 4px; background: var(--success); min-width: 4px; }
+    .profit-bar.neg { background: var(--danger); }
+
+    /* ── Filters ── */
+    .filter-select {
+      padding: 8px 12px;
+      border: 1px solid var(--gray-300);
+      border-radius: 7px;
+      font-size: .85rem;
+      color: var(--gray-700);
+      cursor: pointer;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      #sidebar { width: 52px; }
+      .sidebar-logo .logo-title, .sidebar-logo .logo-sub, .nav-section-label, .nav-item span { display: none; }
+      .nav-item { justify-content: center; padding: 10px; }
+      .dash-grid { grid-template-columns: 1fr; }
+      .page { padding: 16px; }
+      .topbar { padding: 0 16px; }
+    }
+
+    .text-right { text-align: right; }
+    .text-mono { font-family: "Courier New", monospace; }
+    .font-bold { font-weight: 700; }
+    .mt-4 { margin-top: 16px; }
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .gap-2 { gap: 8px; }
+    .w-full { width: 100%; }
+    .lucro-positive { color: var(--success); font-weight: 600; }
+    .lucro-negative { color: var(--danger); font-weight: 600; }
+    .text-muted { color: var(--gray-400); font-size: .82rem; }
+
+    /* ── Confirm dialog ── */
+    .confirm-modal .modal { max-width: 400px; }
+    .confirm-body { padding: 24px; }
+    .confirm-body p { color: var(--gray-600); margin-bottom: 20px; font-size: .9rem; }
+    .confirm-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+    /* ── Toast ── */
+    #toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 2000; display: flex; flex-direction: column; gap: 8px; }
+    .toast {
+      padding: 12px 18px; border-radius: 8px; color: #fff; font-size: .87rem;
+      box-shadow: var(--shadow-md); animation: slideIn .2s ease;
+      max-width: 300px;
+    }
+    .toast-success { background: var(--success); }
+    .toast-error { background: var(--danger); }
+    .toast-info { background: var(--primary); }
+    @keyframes slideIn { from { transform: translateX(60px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
   </style>
 </head>
 <body>
-  <main class="wrap">
-    <h1>Política de Privacidade — Biblioteca IBI</h1>
-    <div class="meta">Última atualização: 26 de janeiro de 2026</div>
-
-    <p>
-      A aplicação <strong>Biblioteca IBI</strong> foi desenvolvida para uso interno de gestão de biblioteca,
-      facilitando o controlo de empréstimos, inventário e cadastro de utilizadores autorizados.
-      Esta política descreve como tratamos dados dentro da aplicação.
-    </p>
-
-    <h2>1. Informações que coletamos</h2>
-    <p>
-      O <strong>Biblioteca IBI não coleta nem envia dados pessoais para servidores externos</strong>.
-      Todo processamento é local.
-    </p>
-
-    <h2>2. Uso da câmara (ISBN)</h2>
-    <p>Usada exclusivamente para leitura de códigos de barras (ISBN). Nenhuma imagem é armazenada.</p>
-
-    <h2>3. Dados de login</h2>
-    <p>Armazenados localmente com hash e salt. Não são enviados a terceiros.</p>
-
-    <h2>4. Armazenamento</h2>
-    <p>Banco local SQLite/Room. Não existe backend.</p>
-
-    <h2>5. Permissões</h2>
-    <ul><li>Câmara — leitura de ISBN</li></ul>
-
-    <h2>6. Público‑alvo</h2>
-    <p>Uso interno por administradores e colaboradores. Não direcionado a crianças.</p>
-
-    <h2>7. Contato</h2>
-    <p>Dúvidas: consulte o email de suporte na Ficha da Loja.</p>
-
-    <div class="footer">
-      <span class="badge">Biblioteca IBI</span>
+<div id="app">
+  <!-- Sidebar -->
+  <nav id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-title">&#x1F697; AutoGestão</div>
+      <div class="logo-sub">Compra &amp; Venda de Veículos</div>
     </div>
-  </main>
+    <div class="sidebar-nav">
+      <div class="nav-section-label">Menu</div>
+      <div class="nav-item active" data-page="dashboard">
+        <span class="icon">&#x1F4CA;</span><span>Dashboard</span>
+      </div>
+      <div class="nav-item" data-page="estoque">
+        <span class="icon">&#x1F697;</span><span>Estoque</span>
+      </div>
+      <div class="nav-item" data-page="compras">
+        <span class="icon">&#x1F6D2;</span><span>Compras</span>
+      </div>
+      <div class="nav-item" data-page="vendas">
+        <span class="icon">&#x1F4B0;</span><span>Vendas</span>
+      </div>
+      <div class="nav-section-label">Análise</div>
+      <div class="nav-item" data-page="relatorios">
+        <span class="icon">&#x1F4C8;</span><span>Relatórios</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <div id="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">Dashboard</div>
+      <div class="topbar-right">
+        <span class="text-muted" id="topbar-date"></span>
+      </div>
+    </div>
+    <div class="page" id="page-content"></div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay hidden" id="modal-overlay">
+  <div class="modal" id="modal-box">
+    <div class="modal-header">
+      <h3 id="modal-title">Título</h3>
+      <button class="modal-close" onclick="Modal.close()">&#x2715;</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- Confirm -->
+<div class="modal-overlay hidden confirm-modal" id="confirm-overlay">
+  <div class="modal" id="confirm-box">
+    <div class="modal-header">
+      <h3 id="confirm-title">Confirmar</h3>
+      <button class="modal-close" onclick="Confirm.cancel()">&#x2715;</button>
+    </div>
+    <div class="confirm-body">
+      <p id="confirm-msg"></p>
+      <div class="confirm-actions">
+        <button class="btn btn-ghost" onclick="Confirm.cancel()">Cancelar</button>
+        <button class="btn btn-danger" id="confirm-ok">Excluir</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast-container"></div>
+
+<script>
+'use strict';
+
+/* ── Storage ── */
+const STORE_KEY = 'autogestao_v1';
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return { vehicles: [], purchases: [], sales: [] };
+}
+
+function saveState() {
+  localStorage.setItem(STORE_KEY, JSON.stringify(state));
+}
+
+let state = loadState();
+
+/* ── ID Gen ── */
+function genId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
+/* ── Formatting ── */
+function fmtBRL(n) {
+  return Number(n || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+function fmtDate(d) {
+  if (!d) return '—';
+  const [y, m, day] = d.split('-');
+  return `${day}/${m}/${y}`;
+}
+
+function todayISO() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+/* ── Vehicle helpers ── */
+function vehicleLabel(v) {
+  if (!v) return '—';
+  return `${v.marca} ${v.modelo} ${v.ano}${v.placa ? ' • ' + v.placa : ''}`;
+}
+
+function vehicleById(id) {
+  return state.vehicles.find(v => v.id === id);
+}
+
+function purchaseByVehicle(vid) {
+  return state.purchases.find(p => p.vehicleId === vid);
+}
+
+function saleByVehicle(vid) {
+  return state.sales.find(s => s.vehicleId === vid);
+}
+
+/* ── Toast ── */
+const Toast = {
+  show(msg, type = 'success') {
+    const el = document.createElement('div');
+    el.className = `toast toast-${type}`;
+    el.textContent = msg;
+    document.getElementById('toast-container').appendChild(el);
+    setTimeout(() => el.remove(), 3200);
+  }
+};
+
+/* ── Confirm ── */
+const Confirm = {
+  _resolve: null,
+  show(msg, title = 'Confirmar exclusão?') {
+    document.getElementById('confirm-title').textContent = title;
+    document.getElementById('confirm-msg').textContent = msg;
+    document.getElementById('confirm-overlay').classList.remove('hidden');
+    return new Promise(res => { this._resolve = res; });
+  },
+  ok() {
+    document.getElementById('confirm-overlay').classList.add('hidden');
+    if (this._resolve) this._resolve(true);
+    this._resolve = null;
+  },
+  cancel() {
+    document.getElementById('confirm-overlay').classList.add('hidden');
+    if (this._resolve) this._resolve(false);
+    this._resolve = null;
+  }
+};
+document.getElementById('confirm-ok').onclick = () => Confirm.ok();
+
+/* ── Modal ── */
+const Modal = {
+  open(title, html) {
+    document.getElementById('modal-title').textContent = title;
+    document.getElementById('modal-body').innerHTML = html;
+    document.getElementById('modal-overlay').classList.remove('hidden');
+  },
+  close() {
+    document.getElementById('modal-overlay').classList.add('hidden');
+    document.getElementById('modal-body').innerHTML = '';
+  }
+};
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-overlay')) Modal.close();
+});
+document.getElementById('confirm-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('confirm-overlay')) Confirm.cancel();
+});
+
+/* ── Nav ── */
+let currentPage = 'dashboard';
+
+function navigate(page) {
+  currentPage = page;
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.page === page));
+  const titles = { dashboard: 'Dashboard', estoque: 'Estoque de Veículos', compras: 'Registro de Compras', vendas: 'Registro de Vendas', relatorios: 'Relatórios Financeiros' };
+  document.getElementById('topbar-title').textContent = titles[page] || page;
+  renderPage(page);
+}
+
+document.querySelectorAll('.nav-item').forEach(el => {
+  el.addEventListener('click', () => navigate(el.dataset.page));
+});
+
+/* ── Pages ── */
+function renderPage(page) {
+  const container = document.getElementById('page-content');
+  switch (page) {
+    case 'dashboard': container.innerHTML = pageDashboard(); break;
+    case 'estoque':   container.innerHTML = pageEstoque(); break;
+    case 'compras':   container.innerHTML = pageCompras(); break;
+    case 'vendas':    container.innerHTML = pageVendas(); break;
+    case 'relatorios': container.innerHTML = pageRelatorios(); break;
+  }
+}
+
+/* ──────────────────────────────── DASHBOARD ──────────────────────────────── */
+function pageDashboard() {
+  const estoque = state.vehicles.filter(v => v.status === 'disponivel');
+  const reservado = state.vehicles.filter(v => v.status === 'reservado');
+  const vendidos = state.vehicles.filter(v => v.status === 'vendido');
+
+  let totalInvestido = 0;
+  estoque.concat(reservado).forEach(v => {
+    const p = purchaseByVehicle(v.id);
+    if (p) totalInvestido += Number(p.valor || 0);
+  });
+
+  let totalRecebido = 0, totalCusto = 0;
+  vendidos.forEach(v => {
+    const s = saleByVehicle(v.id);
+    const p = purchaseByVehicle(v.id);
+    if (s) totalRecebido += Number(s.valor || 0);
+    if (p) totalCusto += Number(p.valor || 0);
+  });
+  const lucro = totalRecebido - totalCusto;
+
+  // Recent activity
+  const activity = [
+    ...state.purchases.map(p => ({ type: 'compra', date: p.data, valor: -Number(p.valor||0), label: vehicleLabel(vehicleById(p.vehicleId)), id: p.id })),
+    ...state.sales.map(s => ({ type: 'venda', date: s.data, valor: Number(s.valor||0), label: vehicleLabel(vehicleById(s.vehicleId)), id: s.id }))
+  ].sort((a, b) => (b.date||'').localeCompare(a.date||'')).slice(0, 8);
+
+  return `
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-icon" style="background:#dbeafe">&#x1F697;</div>
+      <div>
+        <div class="label">Em Estoque</div>
+        <div class="value">${estoque.length}</div>
+        <div class="sub">${reservado.length} reservado(s)</div>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon" style="background:#fee2e2">&#x1F6D2;</div>
+      <div>
+        <div class="label">Total Investido</div>
+        <div class="value" style="font-size:1.1rem">${fmtBRL(totalInvestido)}</div>
+        <div class="sub">em ${estoque.length + reservado.length} veículo(s)</div>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon" style="background:#dcfce7">&#x2705;</div>
+      <div>
+        <div class="label">Total Vendido</div>
+        <div class="value" style="font-size:1.1rem">${fmtBRL(totalRecebido)}</div>
+        <div class="sub">${vendidos.length} venda(s)</div>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon" style="background:${lucro >= 0 ? '#dcfce7' : '#fee2e2'}">&#x1F4B9;</div>
+      <div>
+        <div class="label">Lucro Total</div>
+        <div class="value ${lucro >= 0 ? 'lucro-positive' : 'lucro-negative'}" style="font-size:1.1rem">${fmtBRL(lucro)}</div>
+        <div class="sub">${vendidos.length > 0 ? 'Margem: ' + (totalCusto > 0 ? ((lucro/totalCusto)*100).toFixed(1) : '0') + '%' : 'Sem vendas'}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dash-grid">
+    <div class="card">
+      <div class="card-header"><h2>Atividade Recente</h2></div>
+      <div class="card-body">
+        ${activity.length === 0 ? '<p class="text-muted" style="text-align:center;padding:20px 0">Nenhuma atividade ainda.</p>' : `
+        <ul class="recent-list">
+          ${activity.map(a => `
+          <li class="recent-item">
+            <div class="recent-dot ${a.type}"></div>
+            <div class="recent-info">
+              <div class="recent-title">${a.label}</div>
+              <div class="recent-sub">${a.type === 'compra' ? 'Compra' : 'Venda'} • ${fmtDate(a.date)}</div>
+            </div>
+            <div class="recent-val ${a.type === 'compra' ? 'val-red' : 'val-green'}">${a.type === 'compra' ? '-' : '+'}${fmtBRL(Math.abs(a.valor))}</div>
+          </li>`).join('')}
+        </ul>`}
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h2>Resumo do Estoque</h2></div>
+      <div class="card-body">
+        ${state.vehicles.length === 0 ? '<p class="text-muted" style="text-align:center;padding:20px 0">Nenhum veículo cadastrado.</p>' : `
+        <table><thead><tr><th>Veículo</th><th>Status</th><th class="text-right">Custo</th></tr></thead><tbody>
+          ${state.vehicles.slice(0,6).map(v => {
+            const p = purchaseByVehicle(v.id);
+            return `<tr>
+              <td><div style="font-weight:500">${v.marca} ${v.modelo}</div><div class="text-muted">${v.ano}${v.placa ? ' • '+v.placa : ''}</div></td>
+              <td>${statusBadge(v.status)}</td>
+              <td class="text-right">${p ? fmtBRL(p.valor) : '—'}</td>
+            </tr>`;
+          }).join('')}
+        </tbody></table>
+        ${state.vehicles.length > 6 ? `<p class="text-muted mt-4" style="text-align:center">+${state.vehicles.length-6} veículo(s) — <a href="#" onclick="navigate('estoque');return false">ver todos</a></p>` : ''}`}
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ──────────────────────────────── ESTOQUE ──────────────────────────────── */
+let estoqueFilter = { q: '', status: '' };
+
+function pageEstoque() {
+  let list = state.vehicles.filter(v => {
+    const q = estoqueFilter.q.toLowerCase();
+    const match = !q || `${v.marca} ${v.modelo} ${v.ano} ${v.placa || ''} ${v.cor || ''}`.toLowerCase().includes(q);
+    const s = !estoqueFilter.status || v.status === estoqueFilter.status;
+    return match && s;
+  });
+
+  return `
+  <div class="search-bar">
+    <div class="search-input-wrap">
+      <span class="search-icon">&#x1F50D;</span>
+      <input type="text" placeholder="Buscar por marca, modelo, placa..." value="${estoqueFilter.q}" oninput="estoqueFilter.q=this.value;renderPage('estoque')">
+    </div>
+    <select class="filter-select" onchange="estoqueFilter.status=this.value;renderPage('estoque')">
+      <option value="" ${!estoqueFilter.status?'selected':''}>Todos os status</option>
+      <option value="disponivel" ${estoqueFilter.status==='disponivel'?'selected':''}>Disponível</option>
+      <option value="reservado" ${estoqueFilter.status==='reservado'?'selected':''}>Reservado</option>
+      <option value="vendido" ${estoqueFilter.status==='vendido'?'selected':''}>Vendido</option>
+    </select>
+    <button class="btn btn-primary" onclick="openVehicleForm()">&#xFF0B; Novo Veículo</button>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <h2>Veículos (${list.length})</h2>
+    </div>
+    <div class="table-wrap">
+      ${list.length === 0 ? `<div class="empty-state"><div class="icon">&#x1F697;</div><p>${state.vehicles.length === 0 ? 'Nenhum veículo cadastrado. Clique em "Novo Veículo" para começar.' : 'Nenhum veículo encontrado.'}</p></div>` : `
+      <table>
+        <thead><tr>
+          <th>Veículo</th><th>Placa</th><th>Cor</th><th>KM</th>
+          <th>Custo</th><th>Venda</th><th>Lucro</th><th>Status</th><th></th>
+        </tr></thead>
+        <tbody>
+          ${list.map(v => {
+            const p = purchaseByVehicle(v.id);
+            const s = saleByVehicle(v.id);
+            const custo = Number(p?.valor || 0);
+            const venda = Number(s?.valor || 0);
+            const lucro = s ? venda - custo : null;
+            return `<tr>
+              <td>
+                <div style="font-weight:500">${v.marca} ${v.modelo}</div>
+                <div class="text-muted">${v.ano} • ${v.combustivel || 'Flex'}</div>
+              </td>
+              <td><span class="text-mono">${v.placa || '—'}</span></td>
+              <td>${v.cor || '—'}</td>
+              <td>${v.km ? Number(v.km).toLocaleString('pt-BR') + ' km' : '—'}</td>
+              <td>${custo ? fmtBRL(custo) : '—'}</td>
+              <td>${venda ? fmtBRL(venda) : '—'}</td>
+              <td>${lucro !== null ? `<span class="${lucro >= 0 ? 'lucro-positive' : 'lucro-negative'}">${fmtBRL(lucro)}</span>` : '—'}</td>
+              <td>${statusBadge(v.status)}</td>
+              <td>
+                <div class="flex gap-2">
+                  <button class="btn btn-ghost btn-sm btn-icon" title="Editar" onclick="openVehicleForm('${v.id}')">&#x270F;&#xFE0F;</button>
+                  <button class="btn btn-ghost btn-sm btn-icon" title="Excluir" onclick="deleteVehicle('${v.id}')">&#x1F5D1;</button>
+                </div>
+              </td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>`}
+    </div>
+  </div>`;
+}
+
+function statusBadge(s) {
+  const map = { disponivel: ['badge-green', 'Disponível'], reservado: ['badge-yellow', 'Reservado'], vendido: ['badge-blue', 'Vendido'] };
+  const [cls, label] = map[s] || ['badge-gray', s];
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+
+function openVehicleForm(id) {
+  const v = id ? vehicleById(id) : null;
+  const title = v ? 'Editar Veículo' : 'Novo Veículo';
+  const html = `
+  <form id="vehicle-form" onsubmit="saveVehicle(event,'${id||''}')">
+    <div class="form-grid">
+      <div class="field">
+        <label>Marca *</label>
+        <input type="text" name="marca" value="${v?.marca||''}" placeholder="Ex: Fiat, VW, Toyota" required>
+      </div>
+      <div class="field">
+        <label>Modelo *</label>
+        <input type="text" name="modelo" value="${v?.modelo||''}" placeholder="Ex: Uno, Gol, Corolla" required>
+      </div>
+      <div class="field">
+        <label>Ano *</label>
+        <input type="number" name="ano" value="${v?.ano||''}" placeholder="2020" min="1950" max="2030" required>
+      </div>
+      <div class="field">
+        <label>Placa</label>
+        <input type="text" name="placa" value="${v?.placa||''}" placeholder="ABC-1234" maxlength="10">
+      </div>
+      <div class="field">
+        <label>Cor</label>
+        <input type="text" name="cor" value="${v?.cor||''}" placeholder="Branco, Preto...">
+      </div>
+      <div class="field">
+        <label>Combustível</label>
+        <select name="combustivel">
+          ${['Flex','Gasolina','Diesel','Elétrico','Híbrido','GNV'].map(c => `<option ${(v?.combustivel||'Flex')===c?'selected':''}>${c}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field">
+        <label>Quilometragem (km)</label>
+        <input type="number" name="km" value="${v?.km||''}" placeholder="0" min="0">
+      </div>
+      <div class="field">
+        <label>Chassi (RENAVAM/Chassi)</label>
+        <input type="text" name="chassi" value="${v?.chassi||''}" placeholder="Opcional">
+      </div>
+      <div class="field">
+        <label>Status</label>
+        <select name="status">
+          <option value="disponivel" ${(v?.status||'disponivel')==='disponivel'?'selected':''}>Disponível</option>
+          <option value="reservado" ${v?.status==='reservado'?'selected':''}>Reservado</option>
+          <option value="vendido" ${v?.status==='vendido'?'selected':''}>Vendido</option>
+        </select>
+      </div>
+      <div class="field form-col-full">
+        <label>Observações</label>
+        <textarea name="obs" placeholder="Acessórios, revisões, histórico...">${v?.obs||''}</textarea>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button type="button" class="btn btn-ghost" onclick="Modal.close()">Cancelar</button>
+      <button type="submit" class="btn btn-primary">&#x1F4BE; Salvar</button>
+    </div>
+  </form>`;
+  Modal.open(title, html);
+}
+
+function saveVehicle(e, id) {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const data = Object.fromEntries(fd.entries());
+  if (id) {
+    const idx = state.vehicles.findIndex(v => v.id === id);
+    state.vehicles[idx] = { ...state.vehicles[idx], ...data };
+    Toast.show('Veículo atualizado!');
+  } else {
+    state.vehicles.push({ id: genId(), ...data });
+    Toast.show('Veículo cadastrado!');
+  }
+  saveState(); Modal.close(); renderPage('estoque');
+}
+
+async function deleteVehicle(id) {
+  const v = vehicleById(id);
+  const ok = await Confirm.show(`Excluir "${vehicleLabel(v)}"? Os registros de compra e venda também serão removidos.`);
+  if (!ok) return;
+  state.vehicles = state.vehicles.filter(x => x.id !== id);
+  state.purchases = state.purchases.filter(x => x.vehicleId !== id);
+  state.sales = state.sales.filter(x => x.vehicleId !== id);
+  saveState(); Toast.show('Veículo excluído.', 'error'); renderPage('estoque');
+}
+
+/* ──────────────────────────────── COMPRAS ──────────────────────────────── */
+let comprasFilter = { q: '' };
+
+function pageCompras() {
+  const list = state.purchases.filter(p => {
+    const v = vehicleById(p.vehicleId);
+    const q = comprasFilter.q.toLowerCase();
+    return !q || vehicleLabel(v).toLowerCase().includes(q) || (p.procedencia||'').toLowerCase().includes(q);
+  }).sort((a, b) => (b.data||'').localeCompare(a.data||''));
+
+  const total = list.reduce((s, p) => s + Number(p.valor || 0), 0);
+
+  return `
+  <div class="search-bar">
+    <div class="search-input-wrap">
+      <span class="search-icon">&#x1F50D;</span>
+      <input type="text" placeholder="Buscar por veículo ou procedência..." value="${comprasFilter.q}" oninput="comprasFilter.q=this.value;renderPage('compras')">
+    </div>
+    <button class="btn btn-primary" onclick="openCompraForm()">&#xFF0B; Registrar Compra</button>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <h2>Compras (${list.length})</h2>
+      <span style="font-weight:600;color:var(--danger)">${fmtBRL(total)}</span>
+    </div>
+    <div class="table-wrap">
+      ${list.length === 0 ? `<div class="empty-state"><div class="icon">&#x1F6D2;</div><p>${state.purchases.length === 0 ? 'Nenhuma compra registrada. Clique em "Registrar Compra" para começar.' : 'Nenhuma compra encontrada.'}</p></div>` : `
+      <table>
+        <thead><tr><th>Data</th><th>Veículo</th><th>Procedência</th><th>Forma Pgto</th><th class="text-right">Valor Pago</th><th>Obs.</th><th></th></tr></thead>
+        <tbody>
+          ${list.map(p => {
+            const v = vehicleById(p.vehicleId);
+            return `<tr>
+              <td>${fmtDate(p.data)}</td>
+              <td>
+                <div style="font-weight:500">${vehicleLabel(v)}</div>
+                <div>${v ? statusBadge(v.status) : '<span class="badge badge-gray">Removido</span>'}</div>
+              </td>
+              <td>${p.procedencia || '—'}</td>
+              <td>${p.formaPgto || '—'}</td>
+              <td class="text-right font-bold" style="color:var(--danger)">${fmtBRL(p.valor)}</td>
+              <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${p.obs||''}">${p.obs || '—'}</td>
+              <td>
+                <div class="flex gap-2">
+                  <button class="btn btn-ghost btn-sm btn-icon" onclick="openCompraForm('${p.id}')">&#x270F;&#xFE0F;</button>
+                  <button class="btn btn-ghost btn-sm btn-icon" onclick="deleteCompra('${p.id}')">&#x1F5D1;</button>
+                </div>
+              </td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>`}
+    </div>
+  </div>`;
+}
+
+function openCompraForm(id) {
+  const p = id ? state.purchases.find(x => x.id === id) : null;
+  const disponiveisParaCompra = state.vehicles.filter(v => !p && !purchaseByVehicle(v.id));
+  const vehiclesOptions = p
+    ? state.vehicles.map(v => `<option value="${v.id}" ${v.id === p.vehicleId ? 'selected' : ''}>${vehicleLabel(v)}</option>`).join('')
+    : disponiveisParaCompra.map(v => `<option value="${v.id}">${vehicleLabel(v)}</option>`).join('');
+
+  const html = `
+  <form id="compra-form" onsubmit="saveCompra(event,'${id||''}')">
+    <div class="form-grid">
+      <div class="field form-col-full">
+        <label>Veículo *</label>
+        <select name="vehicleId" required ${p ? 'disabled' : ''}>
+          <option value="">Selecione um veículo</option>
+          ${vehiclesOptions}
+        </select>
+        ${!p && disponiveisParaCompra.length === 0 ? '<span class="hint">Todos os veículos já têm compra registrada. Cadastre um novo veículo primeiro.</span>' : ''}
+        ${p ? `<input type="hidden" name="vehicleId" value="${p.vehicleId}">` : ''}
+      </div>
+      <div class="field">
+        <label>Data da Compra *</label>
+        <input type="date" name="data" value="${p?.data || todayISO()}" required>
+      </div>
+      <div class="field">
+        <label>Valor Pago (R$) *</label>
+        <input type="number" name="valor" value="${p?.valor||''}" placeholder="0,00" min="0" step="0.01" required>
+      </div>
+      <div class="field">
+        <label>Procedência</label>
+        <select name="procedencia">
+          ${['','Particular','Leilão','Concessionária','Loja','Outro'].map(x => `<option ${(p?.procedencia||'')=== x?'selected':''}>${x}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field">
+        <label>Forma de Pagamento</label>
+        <select name="formaPgto">
+          ${['','Dinheiro','PIX','Transferência','Cheque','Financiamento','Outro'].map(x => `<option ${(p?.formaPgto||'')=== x?'selected':''}>${x}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field">
+        <label>Custo Extra (R$)</label>
+        <input type="number" name="custoExtra" value="${p?.custoExtra||''}" placeholder="Funilaria, revisão..." min="0" step="0.01">
+        <span class="hint">Despesas adicionais com o veículo</span>
+      </div>
+      <div class="field form-col-full">
+        <label>Observações</label>
+        <textarea name="obs" placeholder="Detalhes da negociação, condição do veículo...">${p?.obs||''}</textarea>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button type="button" class="btn btn-ghost" onclick="Modal.close()">Cancelar</button>
+      <button type="submit" class="btn btn-primary">&#x1F4BE; Salvar</button>
+    </div>
+  </form>`;
+  Modal.open(p ? 'Editar Compra' : 'Registrar Compra', html);
+}
+
+function saveCompra(e, id) {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const data = Object.fromEntries(fd.entries());
+  if (!data.vehicleId) { Toast.show('Selecione um veículo.', 'error'); return; }
+  if (id) {
+    const idx = state.purchases.findIndex(x => x.id === id);
+    state.purchases[idx] = { ...state.purchases[idx], ...data };
+    Toast.show('Compra atualizada!');
+  } else {
+    if (purchaseByVehicle(data.vehicleId)) { Toast.show('Este veículo já tem uma compra registrada.', 'error'); return; }
+    state.purchases.push({ id: genId(), ...data });
+    Toast.show('Compra registrada!');
+  }
+  saveState(); Modal.close(); renderPage('compras');
+}
+
+async function deleteCompra(id) {
+  const ok = await Confirm.show('Excluir este registro de compra?');
+  if (!ok) return;
+  state.purchases = state.purchases.filter(x => x.id !== id);
+  saveState(); Toast.show('Compra excluída.', 'error'); renderPage('compras');
+}
+
+/* ──────────────────────────────── VENDAS ──────────────────────────────── */
+let vendasFilter = { q: '' };
+
+function pageVendas() {
+  const list = state.sales.filter(s => {
+    const v = vehicleById(s.vehicleId);
+    const q = vendasFilter.q.toLowerCase();
+    return !q || vehicleLabel(v).toLowerCase().includes(q) || (s.comprador||'').toLowerCase().includes(q);
+  }).sort((a, b) => (b.data||'').localeCompare(a.data||''));
+
+  const total = list.reduce((s, x) => s + Number(x.valor || 0), 0);
+
+  return `
+  <div class="search-bar">
+    <div class="search-input-wrap">
+      <span class="search-icon">&#x1F50D;</span>
+      <input type="text" placeholder="Buscar por veículo ou comprador..." value="${vendasFilter.q}" oninput="vendasFilter.q=this.value;renderPage('vendas')">
+    </div>
+    <button class="btn btn-success" onclick="openVendaForm()">&#xFF0B; Registrar Venda</button>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <h2>Vendas (${list.length})</h2>
+      <span style="font-weight:600;color:var(--success)">${fmtBRL(total)}</span>
+    </div>
+    <div class="table-wrap">
+      ${list.length === 0 ? `<div class="empty-state"><div class="icon">&#x1F4B0;</div><p>${state.sales.length === 0 ? 'Nenhuma venda registrada. Clique em "Registrar Venda" para começar.' : 'Nenhuma venda encontrada.'}</p></div>` : `
+      <table>
+        <thead><tr><th>Data</th><th>Veículo</th><th>Comprador</th><th>Forma Pgto</th><th class="text-right">Custo</th><th class="text-right">Valor Venda</th><th class="text-right">Lucro</th><th></th></tr></thead>
+        <tbody>
+          ${list.map(s => {
+            const v = vehicleById(s.vehicleId);
+            const p = purchaseByVehicle(s.vehicleId);
+            const custo = Number(p?.valor || 0) + Number(p?.custoExtra || 0);
+            const lucro = Number(s.valor || 0) - custo;
+            return `<tr>
+              <td>${fmtDate(s.data)}</td>
+              <td><div style="font-weight:500">${vehicleLabel(v)}</div></td>
+              <td>
+                <div>${s.comprador || '—'}</div>
+                ${s.contato ? `<div class="text-muted">${s.contato}</div>` : ''}
+              </td>
+              <td>${s.formaPgto || '—'}</td>
+              <td class="text-right">${custo ? fmtBRL(custo) : '—'}</td>
+              <td class="text-right font-bold" style="color:var(--success)">${fmtBRL(s.valor)}</td>
+              <td class="text-right"><span class="${lucro >= 0 ? 'lucro-positive' : 'lucro-negative'}">${fmtBRL(lucro)}</span></td>
+              <td>
+                <div class="flex gap-2">
+                  <button class="btn btn-ghost btn-sm btn-icon" onclick="openVendaForm('${s.id}')">&#x270F;&#xFE0F;</button>
+                  <button class="btn btn-ghost btn-sm btn-icon" onclick="deleteVenda('${s.id}')">&#x1F5D1;</button>
+                </div>
+              </td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>`}
+    </div>
+  </div>`;
+}
+
+function openVendaForm(id) {
+  const s = id ? state.sales.find(x => x.id === id) : null;
+  const dispVenda = state.vehicles.filter(v => v.status !== 'vendido' || (s && v.id === s.vehicleId));
+  const vendidosIds = new Set(state.sales.map(x => x.vehicleId));
+  const opts = (id
+    ? state.vehicles
+    : state.vehicles.filter(v => !vendidosIds.has(v.id))
+  ).map(v => `<option value="${v.id}" ${s?.vehicleId === v.id ? 'selected' : ''}>${vehicleLabel(v)}</option>`).join('');
+
+  const html = `
+  <form id="venda-form" onsubmit="saveVenda(event,'${id||''}')">
+    <div class="form-grid">
+      <div class="field form-col-full">
+        <label>Veículo *</label>
+        <select name="vehicleId" required ${s ? 'disabled' : ''}>
+          <option value="">Selecione um veículo</option>
+          ${opts}
+        </select>
+        ${s ? `<input type="hidden" name="vehicleId" value="${s.vehicleId}">` : ''}
+      </div>
+      <div class="field">
+        <label>Data da Venda *</label>
+        <input type="date" name="data" value="${s?.data || todayISO()}" required>
+      </div>
+      <div class="field">
+        <label>Valor de Venda (R$) *</label>
+        <input type="number" name="valor" value="${s?.valor||''}" placeholder="0,00" min="0" step="0.01" required>
+      </div>
+      <div class="field">
+        <label>Nome do Comprador</label>
+        <input type="text" name="comprador" value="${s?.comprador||''}" placeholder="Nome completo">
+      </div>
+      <div class="field">
+        <label>Contato</label>
+        <input type="text" name="contato" value="${s?.contato||''}" placeholder="Telefone ou e-mail">
+      </div>
+      <div class="field">
+        <label>Forma de Pagamento</label>
+        <select name="formaPgto">
+          ${['','Dinheiro','PIX','Transferência','Cheque','Financiamento','Outro'].map(x => `<option ${(s?.formaPgto||'')=== x?'selected':''}>${x}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field form-col-full">
+        <label>Observações</label>
+        <textarea name="obs" placeholder="Detalhes da negociação...">${s?.obs||''}</textarea>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button type="button" class="btn btn-ghost" onclick="Modal.close()">Cancelar</button>
+      <button type="submit" class="btn btn-success">&#x1F4BE; Salvar</button>
+    </div>
+  </form>`;
+  Modal.open(s ? 'Editar Venda' : 'Registrar Venda', html);
+}
+
+function saveVenda(e, id) {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const data = Object.fromEntries(fd.entries());
+  if (!data.vehicleId) { Toast.show('Selecione um veículo.', 'error'); return; }
+  if (id) {
+    const idx = state.sales.findIndex(x => x.id === id);
+    state.sales[idx] = { ...state.sales[idx], ...data };
+  } else {
+    if (saleByVehicle(data.vehicleId)) { Toast.show('Este veículo já foi vendido.', 'error'); return; }
+    state.sales.push({ id: genId(), ...data });
+    // Mark vehicle as sold
+    const vidx = state.vehicles.findIndex(v => v.id === data.vehicleId);
+    if (vidx !== -1) state.vehicles[vidx].status = 'vendido';
+  }
+  saveState(); Toast.show('Venda registrada!'); Modal.close(); renderPage('vendas');
+}
+
+async function deleteVenda(id) {
+  const s = state.sales.find(x => x.id === id);
+  const ok = await Confirm.show('Excluir este registro de venda? O veículo voltará ao estoque como Disponível.');
+  if (!ok) return;
+  if (s) {
+    const vidx = state.vehicles.findIndex(v => v.id === s.vehicleId);
+    if (vidx !== -1 && state.vehicles[vidx].status === 'vendido') state.vehicles[vidx].status = 'disponivel';
+  }
+  state.sales = state.sales.filter(x => x.id !== id);
+  saveState(); Toast.show('Venda excluída.', 'error'); renderPage('vendas');
+}
+
+/* ──────────────────────────────── RELATÓRIOS ──────────────────────────────── */
+function pageRelatorios() {
+  // Per-vehicle analysis
+  const rows = state.vehicles.map(v => {
+    const p = purchaseByVehicle(v.id);
+    const s = saleByVehicle(v.id);
+    const custo = Number(p?.valor || 0) + Number(p?.custoExtra || 0);
+    const venda = Number(s?.valor || 0);
+    const lucro = s ? venda - custo : null;
+    const margem = custo && lucro !== null ? (lucro / custo * 100) : null;
+    return { v, p, s, custo, venda, lucro, margem };
+  });
+
+  const vendidos = rows.filter(r => r.s);
+  const totalCusto = vendidos.reduce((a, r) => a + r.custo, 0);
+  const totalVenda = vendidos.reduce((a, r) => a + r.venda, 0);
+  const totalLucro = totalVenda - totalCusto;
+  const margemMedia = vendidos.length && totalCusto ? (totalLucro / totalCusto * 100) : 0;
+  const investimentoEmEstoque = rows.filter(r => !r.s && r.p).reduce((a, r) => a + r.custo, 0);
+
+  const maxLucro = Math.max(...vendidos.map(r => Math.abs(r.lucro || 0)), 1);
+
+  // By formaPgto
+  const pgtoMap = {};
+  state.sales.forEach(s => { const k = s.formaPgto || 'Não inf.'; pgtoMap[k] = (pgtoMap[k] || 0) + 1; });
+  const pgtoEntries = Object.entries(pgtoMap).sort((a, b) => b[1] - a[1]);
+
+  return `
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-icon" style="background:#fee2e2">&#x1F4B8;</div>
+      <div>
+        <div class="label">Total Comprado</div>
+        <div class="value" style="font-size:1.05rem">${fmtBRL(totalCusto)}</div>
+        <div class="sub">${vendidos.length} veículo(s) vendido(s)</div>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon" style="background:#dcfce7">&#x1F4B5;</div>
+      <div>
+        <div class="label">Total Recebido</div>
+        <div class="value" style="font-size:1.05rem">${fmtBRL(totalVenda)}</div>
+        <div class="sub">em ${vendidos.length} venda(s)</div>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon" style="background:${totalLucro >= 0 ? '#dcfce7' : '#fee2e2'}">&#x1F4C8;</div>
+      <div>
+        <div class="label">Lucro Líquido</div>
+        <div class="value ${totalLucro >= 0 ? 'lucro-positive' : 'lucro-negative'}" style="font-size:1.05rem">${fmtBRL(totalLucro)}</div>
+        <div class="sub">Margem: ${margemMedia.toFixed(1)}%</div>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon" style="background:#dbeafe">&#x1F4CA;</div>
+      <div>
+        <div class="label">Capital em Estoque</div>
+        <div class="value" style="font-size:1.05rem">${fmtBRL(investimentoEmEstoque)}</div>
+        <div class="sub">${rows.filter(r => !r.s).length} veículo(s) disponível</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dash-grid">
+    <div class="card">
+      <div class="card-header"><h2>Lucratividade por Veículo</h2></div>
+      <div class="table-wrap">
+        ${vendidos.length === 0 ? '<div class="empty-state" style="padding:30px"><p>Nenhuma venda registrada ainda.</p></div>' : `
+        <table class="report-table">
+          <thead><tr><th>Veículo</th><th class="text-right">Custo</th><th class="text-right">Venda</th><th class="text-right">Lucro</th><th>Margem</th></tr></thead>
+          <tbody>
+            ${vendidos.sort((a,b) => (b.lucro||0) - (a.lucro||0)).map(r => `
+            <tr>
+              <td>${vehicleLabel(r.v)}</td>
+              <td class="text-right">${fmtBRL(r.custo)}</td>
+              <td class="text-right">${fmtBRL(r.venda)}</td>
+              <td class="text-right"><span class="${(r.lucro||0) >= 0 ? 'lucro-positive' : 'lucro-negative'}">${fmtBRL(r.lucro)}</span></td>
+              <td>
+                <div class="profit-bar-wrap">
+                  <div class="profit-bar ${(r.lucro||0) < 0 ? 'neg' : ''}" style="width:${Math.round(Math.abs(r.lucro||0)/maxLucro*100)}px"></div>
+                  <span class="${(r.lucro||0) >= 0 ? 'lucro-positive' : 'lucro-negative'}" style="font-size:.78rem">${r.margem !== null ? r.margem.toFixed(1)+'%' : '—'}</span>
+                </div>
+              </td>
+            </tr>`).join('')}
+          </tbody>
+        </table>`}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><h2>Formas de Pagamento (Vendas)</h2></div>
+      <div class="card-body">
+        ${pgtoEntries.length === 0 ? '<p class="text-muted" style="text-align:center;padding:20px 0">Sem dados ainda.</p>' : `
+        <table>
+          <thead><tr><th>Forma</th><th class="text-right">Qtd</th><th class="text-right">%</th></tr></thead>
+          <tbody>
+            ${pgtoEntries.map(([k, n]) => `
+            <tr>
+              <td>${k || 'Não informado'}</td>
+              <td class="text-right">${n}</td>
+              <td class="text-right">${state.sales.length ? ((n/state.sales.length)*100).toFixed(0)+'%' : '—'}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>`}
+      </div>
+    </div>
+  </div>
+
+  <div class="card mt-4">
+    <div class="card-header">
+      <h2>Todos os Veículos — Análise Completa</h2>
+    </div>
+    <div class="table-wrap">
+      ${rows.length === 0 ? '<div class="empty-state" style="padding:30px"><div class="icon">&#x1F697;</div><p>Nenhum veículo cadastrado.</p></div>' : `
+      <table class="report-table">
+        <thead><tr><th>Veículo</th><th>Status</th><th>Compra</th><th class="text-right">Custo Total</th><th>Venda</th><th class="text-right">Valor Venda</th><th class="text-right">Lucro</th></tr></thead>
+        <tbody>
+          ${rows.map(r => `
+          <tr>
+            <td>${vehicleLabel(r.v)}</td>
+            <td>${statusBadge(r.v.status)}</td>
+            <td>${r.p ? fmtDate(r.p.data) : '—'}</td>
+            <td class="text-right">${r.custo ? fmtBRL(r.custo) : '—'}</td>
+            <td>${r.s ? fmtDate(r.s.data) : '—'}</td>
+            <td class="text-right">${r.venda ? fmtBRL(r.venda) : '—'}</td>
+            <td class="text-right">${r.lucro !== null ? `<span class="${r.lucro >= 0 ? 'lucro-positive' : 'lucro-negative'}">${fmtBRL(r.lucro)}</span>` : '—'}</td>
+          </tr>`).join('')}
+          <tr style="background:var(--gray-50);font-weight:700">
+            <td colspan="3">TOTAL (vendidos)</td>
+            <td class="text-right">${fmtBRL(totalCusto)}</td>
+            <td></td>
+            <td class="text-right">${fmtBRL(totalVenda)}</td>
+            <td class="text-right"><span class="${totalLucro >= 0 ? 'lucro-positive' : 'lucro-negative'}">${fmtBRL(totalLucro)}</span></td>
+          </tr>
+        </tbody>
+      </table>`}
+    </div>
+  </div>`;
+}
+
+/* ── Init ── */
+function init() {
+  document.getElementById('topbar-date').textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+  renderPage('dashboard');
+}
+
+init();
+</script>
 </body>
 </html>
